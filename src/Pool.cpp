@@ -23,7 +23,7 @@
 
 #include <vle/devs/Dynamics.hpp>
 
-#include <Resource.hpp>
+#include <ResourcePool.hpp>
 
 namespace rcpsp {
 
@@ -116,6 +116,21 @@ public:
             }
             ++it;
         }
+    }
+
+    virtual vle::value::Value* observation(
+        const vle::devs::ObservationEvent& event) const
+    {
+        if (event.onPort("available_resources")) {
+            vle::value::Set* list = new vle::value::Set;
+
+            for (Resources::const_iterator it = mPool.available()->begin();
+                 it != mPool.available()->end(); ++it) {
+               list->add(new vle::value::String((*it)->name()));
+            }
+           return list;
+        }
+        return 0;
     }
 
 private:

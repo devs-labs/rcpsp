@@ -209,6 +209,21 @@ public:
         }
     }
 
+    virtual vle::value::Value* observation(
+        const vle::devs::ObservationEvent& event) const
+    {
+        if (event.onPort("waiting")) {
+            vle::value::Set* list = new vle::value::Set;
+
+            for(ActivityFIFO::const_iterator it =  mWaitingActivities.begin();
+                it != mWaitingActivities.end(); ++it) {
+                list->add(new vle::value::String((*it)->name()));
+            }
+            return list;
+        }
+        return 0;
+    }
+
 private:
     enum Phase { WAIT, SEND_DEMAND, SEND_DONE, SEND_PROCESS, SEND_SCHEDULE };
 

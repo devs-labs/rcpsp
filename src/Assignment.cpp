@@ -23,7 +23,8 @@
 
 #include <vle/devs/Dynamics.hpp>
 
-#include <ResourceConstraint.hpp>
+#include <Resources.hpp>
+#include <ResourceConstraints.hpp>
 
 namespace rcpsp {
 
@@ -162,6 +163,12 @@ public:
             }
             ++it;
         }
+    }
+
+    virtual vle::value::Value* observation(
+        const vle::devs::ObservationEvent& event) const
+    {
+        return 0;
     }
 
 private:

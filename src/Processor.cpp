@@ -125,6 +125,73 @@ public:
         computeRemainingTime(time);
     }
 
+    virtual vle::value::Value* observation(
+        const vle::devs::ObservationEvent& event) const
+    {
+        if (event.onPort("running_activity")) {
+            vle::value::Set* list = new vle::value::Set;
+
+            for (Activities::const_iterator it = mRunningActivities.begin();
+                 it != mRunningActivities.end(); ++it) {
+                list->add(new vle::value::String((*it)->name()));
+            }
+            return list;
+        }
+        if (event.onPort("running_step")) {
+            vle::value::Set* list = new vle::value::Set;
+
+            for (Activities::const_iterator it = mRunningActivities.begin();
+                 it != mRunningActivities.end(); ++it) {
+                list->add(new vle::value::String((*it)->current()->name()));
+            }
+            return list;
+        }
+        if (event.onPort("used_resources")) {
+            vle::value::Set* list = new vle::value::Set;
+
+            for (Activities::const_iterator it = mRunningActivities.begin();
+                 it != mRunningActivities.end(); ++it) {
+                const Resources* resources = (*it)->allocatedResources();
+
+                for (Resources::const_iterator itr = resources->begin();
+                     itr != resources->end(); ++itr) {
+                    list->add(new vle::value::String((*itr)->name()));
+                }
+            }
+            return list;
+        }
+        if (event.onPort("used_resource_types")) {
+            std::map < std::string, int > resourceNumber;
+
+            for (Activities::const_iterator it = mRunningActivities.begin();
+                 it != mRunningActivities.end(); ++it) {
+                const Resources* resources = (*it)->allocatedResources();
+
+                for (Resources::const_iterator itr = resources->begin();
+                     itr != resources->end(); ++itr) {
+                    if (resourceNumber.find((*itr)->type()) ==
+                        resourceNumber.end()) {
+                        resourceNumber[(*itr)->type()] = 0;
+                    }
+                    resourceNumber[(*itr)->type()]++;
+                }
+            }
+
+            vle::value::Set* list = new vle::value::Set;
+
+            for (std::map < std::string, int >::const_iterator it =
+                     resourceNumber.begin(); it != resourceNumber.end(); ++it) {
+                vle::value::Set* value = new vle::value::Set;
+
+                value->add(new vle::value::String(it->first));
+                value->add(new vle::value::Integer(it->second));
+                list->add(value);
+            }
+            return list;
+        }
+        return 0;
+    }
+
 private:
     void computeRemainingTime(const vle::devs::Time& time)
     {

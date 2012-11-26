@@ -30,7 +30,7 @@
 #include <vle/value.hpp>
 
 #include <Location.hpp>
-#include <ResourceConstraint.hpp>
+#include <ResourceConstraints.hpp>
 #include <TemporalConstraints.hpp>
 
 namespace rcpsp {

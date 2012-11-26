@@ -2,7 +2,7 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
 <vle_project version="1.0.1" date="sam., 10 mars 2012" author="Eric Ramat">
 <structures>
-<model name="Top model" type="coupled" x="0" y="0" width="847" height="637"  >
+<model name="Top model" type="coupled" x="0" y="0" width="1544" height="755"  >
 <out>
  <port name="out" />
 </out>
@@ -18,7 +18,7 @@
  <port name="location_4" />
 </out>
 </model>
-<model name="location_4" type="coupled" x="353" y="506" width="100" height="60"  >
+<model name="location_4" type="coupled" x="353" y="506" width="847" height="593"  >
 <in>
  <port name="schedule" />
 </in>
@@ -27,7 +27,7 @@
  <port name="schedule" />
 </out>
 <submodels>
-<model name="processor" type="atomic" dynamics="dyn_processor" x="374" y="390" width="100" height="45" >
+<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="374" y="390" width="100" height="45" >
 <in>
  <port name="process" />
 </in>
@@ -35,7 +35,7 @@
  <port name="done" />
 </out>
 </model>
-<model name="scheduler" type="atomic" conditions="cond_step_scheduler_4" dynamics="dyn_step_scheduler" x="130" y="201" width="100" height="105" >
+<model name="scheduler" type="atomic" conditions="cond_step_scheduler_4" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="130" y="201" width="100" height="105" >
 <in>
  <port name="assign" />
  <port name="done" />
@@ -49,7 +49,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="100" height="60"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="593"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -70,7 +70,7 @@
  <port name="release" />
 </out>
 </model>
-<model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" x="334" y="18" width="100" height="75" >
+<model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
 <in>
  <port name="assign" />
  <port name="demand" />
@@ -80,7 +80,7 @@
  <port name="available" />
 </out>
 </model>
-<model name="pool_2" type="atomic" conditions="cond_pool_2" dynamics="dyn_pool" x="345" y="262" width="100" height="75" >
+<model name="pool_2" type="atomic" conditions="cond_pool_2" dynamics="dyn_pool" observables="obs_pool" x="345" y="262" width="100" height="75" >
 <in>
  <port name="assign" />
  <port name="demand" />
@@ -174,7 +174,7 @@
 </connection>
 </connections>
 </model>
-<model name="location_3" type="coupled" x="483" y="358" width="100" height="60"  >
+<model name="location_3" type="coupled" x="483" y="358" width="847" height="593"  >
 <in>
  <port name="schedule" />
 </in>
@@ -183,7 +183,7 @@
  <port name="schedule" />
 </out>
 <submodels>
-<model name="processor" type="atomic" dynamics="dyn_processor" x="383" y="413" width="100" height="45" >
+<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="383" y="413" width="100" height="45" >
 <in>
  <port name="process" />
 </in>
@@ -191,7 +191,7 @@
  <port name="done" />
 </out>
 </model>
-<model name="scheduler" type="atomic" conditions="cond_step_scheduler_3" dynamics="dyn_step_scheduler" x="130" y="200" width="100" height="105" >
+<model name="scheduler" type="atomic" conditions="cond_step_scheduler_3" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="130" y="200" width="100" height="105" >
 <in>
  <port name="assign" />
  <port name="done" />
@@ -205,7 +205,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="100" height="60"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="593"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -226,7 +226,7 @@
  <port name="release" />
 </out>
 </model>
-<model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" x="334" y="18" width="100" height="75" >
+<model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
 <in>
  <port name="assign" />
  <port name="demand" />
@@ -236,7 +236,7 @@
  <port name="available" />
 </out>
 </model>
-<model name="pool_2" type="atomic" conditions="cond_pool_2" dynamics="dyn_pool" x="345" y="262" width="100" height="75" >
+<model name="pool_2" type="atomic" conditions="cond_pool_2" dynamics="dyn_pool" observables="obs_pool" x="345" y="262" width="100" height="75" >
 <in>
  <port name="assign" />
  <port name="demand" />
@@ -330,7 +330,7 @@
 </connection>
 </connections>
 </model>
-<model name="location_2" type="coupled" x="483" y="125" width="100" height="60"  >
+<model name="location_2" type="coupled" x="483" y="125" width="847" height="593"  >
 <in>
  <port name="schedule" />
 </in>
@@ -339,7 +339,7 @@
  <port name="schedule" />
 </out>
 <submodels>
-<model name="processor" type="atomic" dynamics="dyn_processor" x="309" y="370" width="100" height="45" >
+<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="309" y="370" width="100" height="45" >
 <in>
  <port name="process" />
 </in>
@@ -347,7 +347,7 @@
  <port name="done" />
 </out>
 </model>
-<model name="scheduler" type="atomic" conditions="cond_step_scheduler_2" dynamics="dyn_step_scheduler" x="130" y="200" width="100" height="105" >
+<model name="scheduler" type="atomic" conditions="cond_step_scheduler_2" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="130" y="200" width="100" height="105" >
 <in>
  <port name="assign" />
  <port name="done" />
@@ -361,7 +361,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="100" height="60"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="593"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -382,7 +382,7 @@
  <port name="release" />
 </out>
 </model>
-<model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" x="334" y="18" width="100" height="75" >
+<model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
 <in>
  <port name="assign" />
  <port name="demand" />
@@ -392,7 +392,7 @@
  <port name="available" />
 </out>
 </model>
-<model name="pool_2" type="atomic" conditions="cond_pool_2" dynamics="dyn_pool" x="345" y="262" width="100" height="75" >
+<model name="pool_2" type="atomic" conditions="cond_pool_2" dynamics="dyn_pool" observables="obs_pool" x="345" y="262" width="100" height="75" >
 <in>
  <port name="assign" />
  <port name="demand" />
@@ -495,7 +495,7 @@
  <port name="schedule" />
 </out>
 <submodels>
-<model name="processor" type="atomic" dynamics="dyn_processor" x="308" y="278" width="100" height="45" >
+<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="308" y="278" width="100" height="45" >
 <in>
  <port name="process" />
 </in>
@@ -503,7 +503,7 @@
  <port name="done" />
 </out>
 </model>
-<model name="scheduler" type="atomic" conditions="cond_step_scheduler_1" dynamics="dyn_step_scheduler" x="114" y="124" width="100" height="105" >
+<model name="scheduler" type="atomic" conditions="cond_step_scheduler_1" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="114" y="124" width="100" height="105" >
 <in>
  <port name="assign" />
  <port name="done" />
@@ -517,7 +517,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="325" y="18" width="847" height="637"  >
+<model name="ressource_manager" type="coupled" x="325" y="18" width="100" height="60"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -538,7 +538,7 @@
  <port name="release" />
 </out>
 </model>
-<model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" x="334" y="18" width="100" height="75" >
+<model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
 <in>
  <port name="assign" />
  <port name="demand" />
@@ -548,7 +548,7 @@
  <port name="available" />
 </out>
 </model>
-<model name="pool_2" type="atomic" conditions="cond_pool_2" dynamics="dyn_pool" x="345" y="262" width="100" height="75" >
+<model name="pool_2" type="atomic" conditions="cond_pool_2" dynamics="dyn_pool" observables="obs_pool" x="345" y="261" width="100" height="75" >
 <in>
  <port name="assign" />
  <port name="demand" />
@@ -773,6 +773,73 @@
 </condition>
 </conditions>
 <views>
+<outputs>
+<output name="view_available_resources" location="" format="local" plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_running_activity" location="" format="local" plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_running_step" location="" format="local" plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_used_resource_types" location="" format="local" plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_used_resources" location="" format="local" plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_waiting" location="" format="local" plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+</outputs>
+<observables>
+<observable name="obs_pool" >
+<port name="available_resources" >
+ <attachedview name="view_available_resources" />
+</port>
+
+</observable>
+
+<observable name="obs_processor" >
+<port name="running_activity" >
+ <attachedview name="view_running_activity" />
+</port>
+
+<port name="running_step" >
+ <attachedview name="view_running_step" />
+</port>
+
+<port name="used_resource_types" >
+ <attachedview name="view_used_resource_types" />
+</port>
+
+<port name="used_resources" >
+ <attachedview name="view_used_resources" />
+</port>
+
+</observable>
+
+<observable name="obs_scheduler" >
+<port name="waiting" >
+ <attachedview name="view_waiting" />
+</port>
+
+</observable>
+
+</observables>
+<view name="view_available_resources" output="view_available_resources" type="timed" timestep="1.000000000000000" />
+
+<view name="view_running_activity" output="view_running_activity" type="timed" timestep="1.000000000000000" />
+
+<view name="view_running_step" output="view_running_step" type="timed" timestep="1.000000000000000" />
+
+<view name="view_used_resource_types" output="view_used_resource_types" type="timed" timestep="1.000000000000000" />
+
+<view name="view_used_resources" output="view_used_resources" type="timed" timestep="1.000000000000000" />
+
+<view name="view_waiting" output="view_waiting" type="timed" timestep="1.000000000000000" />
+
 </views>
 </experiment>
 </vle_project>

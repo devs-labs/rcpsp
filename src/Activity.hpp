@@ -29,6 +29,7 @@
 
 #include <vle/value/Value.hpp>
 
+#include <Resources.hpp>
 #include <Steps.hpp>
 #include <TemporalConstraints.hpp>
 

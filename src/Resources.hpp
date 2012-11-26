@@ -1,5 +1,5 @@
 /**
- * @file ResourceConstraint.hpp
+ * @file Resources.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,64 +21,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RESOURCE_CONTRAINT_HPP
-#define __RESOURCE_CONTRAINT_HPP 1
+#ifndef __RESOURCES_HPP
+#define __RESOURCES_HPP 1
 
 #include <string>
-#include <vle/devs/Time.hpp>
+#include <vector>
+
 #include <vle/value.hpp>
 
 #include <Resource.hpp>
 
 namespace rcpsp {
 
-class ResourceConstraint
+class Resources : public std::vector < Resource* >
 {
 public:
-    ResourceConstraint(const std::string& type, int quantity) :
-        mType(type), mQuantity(quantity)
+    Resources()
     { }
 
-    ResourceConstraint(const vle::value::Value* value)
+    Resources(const vle::value::Value* value)
     {
         const vle::value::Set* set =
             dynamic_cast < const vle::value::Set* >(value);
 
-        mType = vle::value::toString(set->get(0));
-        mQuantity = vle::value::toInteger(set->get(1));
+        for (unsigned int i = 0; i < set->size(); ++i) {
+            push_back(new Resource(set->get(i)));
+        }
     }
 
-    ResourceConstraint(const ResourceConstraint& rc) :
-        mType(rc.mType),
-        mQuantity(rc.mQuantity)
-    { }
+    virtual ~Resources()
+    { for(iterator it = begin(); it != end(); ++it) delete *it; }
 
-    unsigned int quantity() const
-    { return mQuantity; }
-
-    virtual const ResourceConstraint& operator=(const ResourceConstraint& rc)
+    void add(const Resources& r)
     {
-        mType = rc.mType;
-        mQuantity = rc.mQuantity;
-        return *this;
+        for (Resources::const_iterator itr = r.begin(); itr != r.end();
+             ++itr) {
+            push_back(*itr);
+        }
     }
+
+    static Resources* build(const vle::value::Value& value)
+    { return new Resources(&value); }
 
     vle::value::Value* toValue() const
     {
         vle::value::Set* value = new vle::value::Set;
 
-        value->add(new vle::value::String(mType));
-        value->add(new vle::value::Integer(mQuantity));
+        for (const_iterator it = begin(); it != end(); ++it) {
+            value->add((*it)->toValue());
+        }
         return value;
     }
-
-    const std::string& type() const
-    { return mType; }
-
-private:
-    std::string mType;
-    unsigned int mQuantity;
 };
+
+std::ostream& operator<<(std::ostream& o, const Resources& r);
 
 } // namespace rcpsp
 

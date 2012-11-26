@@ -1,5 +1,5 @@
 /**
- * @file Resource.cpp
+ * @file Resources.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,13 +21,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Resource.hpp>
+#include <Resources.hpp>
 
 namespace rcpsp {
 
-std::ostream& operator<<(std::ostream& o, const Resource& r)
+std::ostream& operator<<(std::ostream& o, const Resources& r)
 {
-    o << "[ " << r.mName << " , " << r.mType << " ]";
+    o << "{ ";
+    for (Resources::const_iterator it = r.begin(); it != r.end(); ++it) {
+        o << **it << " ";
+    }
+    o << "}";
     return o;
 }
 

@@ -30,6 +30,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 
 #include <Activity.hpp>
+#include <ResourcePool.hpp>
 
 using namespace rcpsp;
 

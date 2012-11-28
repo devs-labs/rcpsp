@@ -2,7 +2,7 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
 <vle_project version="1.0.1" date="sam., 10 mars 2012" author="Eric Ramat">
 <structures>
-<model name="Top model" type="coupled" x="0" y="0" width="1544" height="755"  >
+<model name="Top model" type="coupled" x="0" y="0" width="1544" height="1139"  >
 <out>
  <port name="out" />
 </out>
@@ -18,7 +18,7 @@
  <port name="location_4" />
 </out>
 </model>
-<model name="location_4" type="coupled" x="353" y="506" width="847" height="593"  >
+<model name="location_4" type="coupled" x="353" y="506" width="100" height="60"  >
 <in>
  <port name="schedule" />
 </in>
@@ -49,7 +49,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="593"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="591"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -77,6 +77,7 @@
  <port name="release" />
 </in>
 <out>
+ <port name="assign" />
  <port name="available" />
 </out>
 </model>
@@ -87,13 +88,18 @@
  <port name="release" />
 </in>
 <out>
+ <port name="assign" />
  <port name="available" />
 </out>
 </model>
 </submodels>
 <connections>
 <connection type="output">
- <origin model="assignment" port="assign" />
+ <origin model="pool_1" port="assign" />
+ <destination model="ressource_manager" port="assign" />
+</connection>
+<connection type="output">
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">
@@ -174,7 +180,7 @@
 </connection>
 </connections>
 </model>
-<model name="location_3" type="coupled" x="483" y="358" width="847" height="593"  >
+<model name="location_3" type="coupled" x="483" y="358" width="100" height="60"  >
 <in>
  <port name="schedule" />
 </in>
@@ -205,7 +211,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="593"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="591"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -233,6 +239,7 @@
  <port name="release" />
 </in>
 <out>
+ <port name="assign" />
  <port name="available" />
 </out>
 </model>
@@ -243,13 +250,18 @@
  <port name="release" />
 </in>
 <out>
+ <port name="assign" />
  <port name="available" />
 </out>
 </model>
 </submodels>
 <connections>
 <connection type="output">
- <origin model="assignment" port="assign" />
+ <origin model="pool_1" port="assign" />
+ <destination model="ressource_manager" port="assign" />
+</connection>
+<connection type="output">
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">
@@ -330,7 +342,7 @@
 </connection>
 </connections>
 </model>
-<model name="location_2" type="coupled" x="483" y="125" width="847" height="593"  >
+<model name="location_2" type="coupled" x="483" y="125" width="100" height="60"  >
 <in>
  <port name="schedule" />
 </in>
@@ -361,7 +373,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="593"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="591"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -389,6 +401,7 @@
  <port name="release" />
 </in>
 <out>
+ <port name="assign" />
  <port name="available" />
 </out>
 </model>
@@ -399,13 +412,18 @@
  <port name="release" />
 </in>
 <out>
+ <port name="assign" />
  <port name="available" />
 </out>
 </model>
 </submodels>
 <connections>
 <connection type="output">
- <origin model="assignment" port="assign" />
+ <origin model="pool_1" port="assign" />
+ <destination model="ressource_manager" port="assign" />
+</connection>
+<connection type="output">
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">
@@ -545,6 +563,7 @@
  <port name="release" />
 </in>
 <out>
+ <port name="assign" />
  <port name="available" />
 </out>
 </model>
@@ -555,13 +574,18 @@
  <port name="release" />
 </in>
 <out>
+ <port name="assign" />
  <port name="available" />
 </out>
 </model>
 </submodels>
 <connections>
 <connection type="output">
- <origin model="assignment" port="assign" />
+ <origin model="pool_1" port="assign" />
+ <destination model="ressource_manager" port="assign" />
+</connection>
+<connection type="output">
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">

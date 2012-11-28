@@ -76,6 +76,9 @@ public:
     virtual ~Step()
     { }
 
+    bool checkResourceConstraint(const Resources& r) const
+    { return mResourceConstraints.checkResourceConstraint(r); }
+
     bool done(const vle::devs::Time& time) const
     { return mDuration == time - mStartDate; }
 

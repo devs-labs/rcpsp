@@ -55,6 +55,27 @@ Activity::Activity(const vle::value::Value* value)
     }
 }
 
+void Activity::assign(Resources* r)
+{
+    if (mAllocatedResources) {
+        for (Resources::const_iterator it = r->begin(); it != r->end(); ++it) {
+            mAllocatedResources->push_back(*it);
+        }
+        delete r;
+    } else {
+        mAllocatedResources = r;
+    }
+}
+
+bool Activity::checkResourceConstraint() const
+{
+    if (mStepIterator != mSteps->end()) {
+        return (*mStepIterator)->checkResourceConstraint(*mAllocatedResources);
+    } else {
+        return false;
+    }
+}
+
 bool Activity::done(const vle::devs::Time& time) const
 {
     if (not mSteps->empty() and mStepIterator != mSteps->end()) {

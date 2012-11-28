@@ -29,6 +29,7 @@
 #include <vle/value.hpp>
 
 #include <ResourceConstraint.hpp>
+#include <Resources.hpp>
 
 namespace rcpsp {
 
@@ -50,6 +51,8 @@ public:
 
     static ResourceConstraints* build(const vle::value::Value& value)
     { return new ResourceConstraints(&value); }
+
+    bool checkResourceConstraint(const Resources& r) const;
 
     unsigned int quantity() const
     {

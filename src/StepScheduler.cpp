@@ -46,7 +46,7 @@ public:
         return vle::devs::Time::infinity;
     }
 
-    void output(const vle::devs::Time& /* time */,
+    void output(const vle::devs::Time& time,
                 vle::devs::ExternalEventList& output) const
     {
         if (mPhase == SEND_DEMAND) {
@@ -56,7 +56,8 @@ public:
 
                 std::cout << "[" << getModel().getParentName()
                           << ":" << getModelName()
-                          << "] - " << mWaitingActivities.front()->name()
+                          << "] at " << time
+                          << " - " << mWaitingActivities.front()->name()
                           << " - demand" << std::endl;
 
                 ee << vle::devs::attribute("resources",
@@ -70,7 +71,13 @@ public:
                 vle::devs::ExternalEvent* ee =
                     new vle::devs::ExternalEvent("process");
 
-                ee << vle::devs::attribute("activity",
+                 std::cout << "[" << getModel().getParentName()
+                          << ":" << getModelName()
+                          << "] at " << time
+                          << " - " << mRunningActivity->name()
+                          << " - process" << std::endl;
+
+               ee << vle::devs::attribute("activity",
                                            mRunningActivity->toValue());
                 output.addEvent(ee);
             }
@@ -84,14 +91,6 @@ public:
                     ee << vle::devs::attribute("location",
                                                (*it)->location().name());
                     ee << vle::devs::attribute("activity", (*it)->toValue());
-                    output.addEvent(ee);
-                }
-                {
-                    vle::devs::ExternalEvent* ee =
-                        new vle::devs::ExternalEvent("release");
-
-                    ee << vle::devs::attribute(
-                        "resources", (*it)->allocatedResources()->toValue());
                     output.addEvent(ee);
                 }
             }
@@ -111,6 +110,16 @@ public:
                     ee << vle::devs::attribute("activity", (*it)->toValue());
                     output.addEvent(ee);
                 }
+            }
+        } else if (mPhase == SEND_RELEASE) {
+            for(Activities::const_iterator it = mReleasedActivities.begin();
+                it != mReleasedActivities.end(); ++it) {
+
+                std::cout << "[" << getModel().getParentName()
+                          << ":" << getModelName()
+                          << "] - " << (*it)->name()
+                          << " - release" << std::endl;
+
                 {
                     vle::devs::ExternalEvent* ee =
                         new vle::devs::ExternalEvent("release");
@@ -126,7 +135,8 @@ public:
     vle::devs::Time timeAdvance() const
     {
         if (mPhase == SEND_DEMAND or mPhase == SEND_DONE or
-            mPhase == SEND_PROCESS or mPhase == SEND_SCHEDULE) {
+            mPhase == SEND_PROCESS or mPhase == SEND_RELEASE or
+            mPhase == SEND_SCHEDULE) {
             return 0;
         } else {
             return vle::devs::Time::infinity;
@@ -149,7 +159,30 @@ public:
                 delete mRunningActivity;
                 mRunningActivity = 0;
             }
-            mPhase = WAIT;
+            if (mWaitingActivities.empty()) {
+                mPhase = WAIT;
+            } else {
+                mPhase = SEND_DEMAND;
+            }
+        } else if (mPhase == SEND_RELEASE) {
+            while (not mReleasedActivities.empty()) {
+                Activity* a = mReleasedActivities.back();
+
+                a->release();
+                if (a->end()) {
+                    mDoneActivities.push_back(a);
+                    mPhase = SEND_DONE;
+                } else {
+                    if (mLocation == a->location().name()) {
+                        mWaitingActivities.push_back(a);
+                        mPhase = SEND_DEMAND;
+                    } else {
+                        mSchedulingActivities.push_back(a);
+                        mPhase = SEND_SCHEDULE;
+                    }
+                }
+                mReleasedActivities.pop_back();
+            }
         } else if (mPhase == SEND_SCHEDULE) {
             mSchedulingActivities.clear();
             if (mWaitingActivities.empty()) {
@@ -174,7 +207,8 @@ public:
 
                     std::cout << "[" << getModel().getParentName()
                               << ":" << getModelName()
-                              << "] - schedule = " << a->current()->name()
+                              << "] at " << time
+                              << " - schedule = " << a->current()->name()
                               << "/" << a->name() << std::endl;
 
                     mWaitingActivities.push_back(a);
@@ -183,27 +217,33 @@ public:
             } else if ((*it)->onPort("assign")) {
                 Resources* r = Resources::build(
                     (*it)->getAttributeValue("resources"));
+                Activity* a = mWaitingActivities.front();
 
-                mRunningActivity = mWaitingActivities.front();
-                mRunningActivity->assign(r);
-                mWaitingActivities.pop_front();
-                mPhase = SEND_PROCESS;
+                std::cout << "[" << getModel().getParentName()
+                          << ":" << getModelName()
+                          << "] - assign = " << r->size()
+                          << " -> " << a->name()
+                          << " -> ";
+                if (a->allocatedResources()) {
+                    std::cout << *a->allocatedResources();
+                } else {
+                    std::cout << "{}";
+
+                }
+                std::cout << std::endl;
+
+                a->assign(r);
+                if (a->checkResourceConstraint()) {
+                    mRunningActivity = a;
+                    mWaitingActivities.pop_front();
+                    mPhase = SEND_PROCESS;
+                }
             } else if ((*it)->onPort("done")) {
                 Activity* a =
                     Activity::build((*it)->getAttributeValue("activity"));
 
-                if (a->end()) {
-                    mDoneActivities.push_back(a);
-                    mPhase = SEND_DONE;
-                } else {
-                    if (mLocation == a->location().name()) {
-                        mWaitingActivities.push_back(a);
-                        mPhase = SEND_DEMAND;
-                    } else {
-                        mSchedulingActivities.push_back(a);
-                        mPhase = SEND_SCHEDULE;
-                    }
-                }
+                mReleasedActivities.push_back(a);
+                mPhase = SEND_RELEASE;
             }
             ++it;
         }
@@ -225,7 +265,8 @@ public:
     }
 
 private:
-    enum Phase { WAIT, SEND_DEMAND, SEND_DONE, SEND_PROCESS, SEND_SCHEDULE };
+    enum Phase { WAIT, SEND_DEMAND, SEND_DONE, SEND_PROCESS, SEND_RELEASE,
+                 SEND_SCHEDULE };
 
     std::string mLocation;
 
@@ -233,6 +274,7 @@ private:
     ActivityFIFO mWaitingActivities;
     Activity* mRunningActivity;
     Activities mDoneActivities;
+    Activities mReleasedActivities;
     Activities mSchedulingActivities;
 };
 

@@ -40,7 +40,7 @@ public:
     vle::devs::Time init(const vle::devs::Time& /* time */)
     {
         mResourceConstraints = 0;
-        mDeliveredResources = 0;
+        mAvailableResourceNumber = 0;
         mReleasedResources = 0;
         mPhase = WAIT;
         return vle::devs::Time::infinity;
@@ -50,12 +50,16 @@ public:
                 vle::devs::ExternalEventList& output) const
     {
         if (mPhase == SEND_ASSIGN) {
-            vle::devs::ExternalEvent* ee =
-                new vle::devs::ExternalEvent("assign");
+            for (ResourceConstraints::const_iterator it =
+                     mResourceConstraints->begin();
+                 it != mResourceConstraints->end(); ++it) {
+                vle::devs::ExternalEvent* ee =
+                    new vle::devs::ExternalEvent("assign");
 
-            ee << vle::devs::attribute("resources",
-                                       mDeliveredResources->toValue());
-            output.addEvent(ee);
+                ee << vle::devs::attribute("type", it->type());
+                ee << vle::devs::attribute("quantity", (int)it->quantity());
+                output.addEvent(ee);
+            }
         } else if (mPhase == SEND_DEMAND) {
             for (ResourceConstraints::const_iterator it =
                      mResourceConstraints->begin();
@@ -63,13 +67,13 @@ public:
                 vle::devs::ExternalEvent* ee =
                     new vle::devs::ExternalEvent("demand");
 
-                 std::cout << "[" << getModel().getParentName()
-                           << ":" << getModelName()
-                           << "] - demand => "
-                           << it->type() << " = " << it->quantity()
-                           << std::endl;
+                std::cout << "[" << getModel().getParentName()
+                          << ":" << getModelName()
+                          << "] - demand => "
+                          << it->type() << " = " << it->quantity()
+                          << std::endl;
 
-               ee << vle::devs::attribute("type", it->type());
+                ee << vle::devs::attribute("type", it->type());
                 ee << vle::devs::attribute("quantity", (int)it->quantity());
                 output.addEvent(ee);
             }
@@ -96,8 +100,7 @@ public:
     void internalTransition(const vle::devs::Time& /* time */)
     {
         if (mPhase == SEND_ASSIGN) {
-            delete mDeliveredResources;
-            mDeliveredResources = 0;
+            mAvailableResourceNumber = 0;
             delete mResourceConstraints;
             mResourceConstraints = 0;
             mPhase = WAIT;
@@ -118,26 +121,24 @@ public:
 
         while (it != events.end()) {
             if ((*it)->onPort("available")) {
-                Resources* r = Resources::build(
-                    (*it)->getAttributeValue("resources"));
+                bool available = (*it)->getBooleanAttributeValue("available");
+                unsigned int number = (*it)->getIntegerAttributeValue("number");
 
-                if (mDeliveredResources) {
-                    mDeliveredResources->add(*r);
-                    r->clear();
-                    delete r;
-                } else {
-                    mDeliveredResources = r;
+                if (available) {
+                    mAvailableResourceNumber += number;
                 }
 
                 std::cout << "[" << getModel().getParentName()
                           << ":" << getModelName()
-                          << "] - assign = " << mDeliveredResources->size()
+                          << "] - available = " << mAvailableResourceNumber
                           << "/" << mResourceConstraints->quantity()
                           << std::endl;
 
-                if (mDeliveredResources->size() ==
+                if (mAvailableResourceNumber ==
                     mResourceConstraints->quantity()) {
                     mPhase = SEND_ASSIGN;
+                } else {
+                    mPhase = WAIT;
                 }
             } else if ((*it)->onPort("demand")) {
                 mResourceConstraints =
@@ -176,7 +177,7 @@ private:
 
     Phase mPhase;
     ResourceConstraints* mResourceConstraints;
-    Resources* mDeliveredResources;
+    unsigned int mAvailableResourceNumber;
     Resources* mReleasedResources;
 };
 

@@ -50,7 +50,7 @@ public:
     }
 
     virtual ~Resources()
-    { for(iterator it = begin(); it != end(); ++it) delete *it; }
+    { }
 
     void add(const Resources& r)
     {

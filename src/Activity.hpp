@@ -68,11 +68,12 @@ public:
     const Resources* allocatedResources() const
     { return mAllocatedResources; }
 
-    void assign(Resources* r)
-    { mAllocatedResources = r; }
+    void assign(Resources* r);
 
     static Activity* build(const vle::value::Value& value)
     { return new Activity(&value); }
+
+    bool checkResourceConstraint() const;
 
     const Step* current() const
     { return *mStepIterator; }

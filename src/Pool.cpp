@@ -39,6 +39,7 @@ public:
 
     vle::devs::Time init(const vle::devs::Time& /* time */)
     {
+        mAvailable = false;
         mDeliveredResources = 0;
         mPhase = WAIT;
         return vle::devs::Time::infinity;
@@ -47,21 +48,38 @@ public:
     void output(const vle::devs::Time& /* time */,
                 vle::devs::ExternalEventList& output) const
     {
-        if (mPhase == SEND) {
-            if (mDeliveredResources) { // TODO: ???
-                vle::devs::ExternalEvent* ee =
-                    new vle::devs::ExternalEvent("available");
+        if (mPhase == SEND_AVAILABLE) {
+            vle::devs::ExternalEvent* ee =
+                new vle::devs::ExternalEvent("available");
 
-                ee << vle::devs::attribute("resources",
-                                           mDeliveredResources->toValue());
-                output.addEvent(ee);
-            }
+            std::cout << "[" << getModel().getParentName()
+                      << ":" << getModelName()
+                      << "] - " << mPool.type()
+                      << ": send available = " << mAvailableNumber
+                      << std::endl;
+
+            ee << vle::devs::attribute("available", mAvailable);
+            ee << vle::devs::attribute("number", mAvailableNumber);
+            output.addEvent(ee);
+        } else if (mPhase == SEND_ASSIGN) {
+            vle::devs::ExternalEvent* ee =
+                new vle::devs::ExternalEvent("assign");
+
+            std::cout << "[" << getModel().getParentName()
+                      << ":" << getModelName()
+                      << "] - " << mPool.type()
+                      << ": send assign = " << mDeliveredResources->size()
+                      << std::endl;
+
+            ee << vle::devs::attribute("resources",
+                                       mDeliveredResources->toValue());
+            output.addEvent(ee);
         }
     }
 
     vle::devs::Time timeAdvance() const
     {
-        if (mPhase == SEND) {
+        if (mPhase == SEND_ASSIGN or mPhase == SEND_AVAILABLE) {
             return 0;
         } else {
             return vle::devs::Time::infinity;
@@ -70,7 +88,11 @@ public:
 
     void internalTransition(const vle::devs::Time& /* time */)
     {
-        if (mPhase == SEND) {
+        if (mPhase == SEND_AVAILABLE) {
+            mAvailable = false;
+            mAvailableNumber = 0;
+            mPhase = WAIT;
+        } else if (mPhase == SEND_ASSIGN) {
             delete mDeliveredResources;
             mDeliveredResources = 0;
             mPhase = WAIT;
@@ -85,9 +107,18 @@ public:
 
         while (it != events.end()) {
             if ((*it)->onPort("assign")) {
+                if (mPool.type() == (*it)->getStringAttributeValue("type")) {
+                    int quantity = (*it)->getIntegerAttributeValue("quantity");
 
-                // TODO
+                    std::cout << "[" << getModel().getParentName()
+                              << ":" << getModelName()
+                              << "] - " << mPool.type()
+                              << ": assign = " << quantity
+                              << "/" << mPool.quantity() << std::endl;
 
+                    mDeliveredResources = mPool.assign(quantity);
+                    mPhase = SEND_ASSIGN;
+                }
             } else if ((*it)->onPort("demand")) {
                 if (mPool.type() == (*it)->getStringAttributeValue("type")) {
                     int quantity = (*it)->getIntegerAttributeValue("quantity");
@@ -99,9 +130,13 @@ public:
                               << "/" << mPool.quantity() << std::endl;
 
                     if (quantity <= mPool.quantity()) {
-                        mDeliveredResources = mPool.assign(quantity);
+                        mAvailable = true;
+                        mAvailableNumber = quantity;
+                    } else {
+                        mAvailable = false;
+                        mAvailableNumber = 0;
                     }
-                    mPhase = SEND;
+                    mPhase = SEND_AVAILABLE;
                 }
             } else if ((*it)->onPort("release")) {
                 Resources* r = Resources::build(
@@ -113,6 +148,8 @@ public:
                           << ": release = " << *r << std::endl;
 
                 mPool.release(r);
+//                delete r;
+                mPhase = WAIT;
             }
             ++it;
         }
@@ -134,10 +171,12 @@ public:
     }
 
 private:
-    enum Phase { WAIT, SEND };
+    enum Phase { WAIT, SEND_ASSIGN, SEND_AVAILABLE };
 
     Phase mPhase;
     ResourcePool mPool;
+    bool mAvailable;
+    int mAvailableNumber;
     Resources* mDeliveredResources;
 };
 

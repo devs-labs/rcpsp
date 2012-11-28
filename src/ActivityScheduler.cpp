@@ -43,7 +43,7 @@ public:
     vle::devs::Time init(const vle::devs::Time& /* time */)
     {
         mPhase = INIT;
-        return 0;
+        return vle::devs::Time::infinity;
     }
 
     void output(const vle::devs::Time& /* time */,
@@ -72,16 +72,9 @@ public:
         else return vle::devs::Time::infinity;
     }
 
-    void internalTransition(const vle::devs::Time& time)
+    void internalTransition(const vle::devs::Time& /* time */)
     {
-        if (mPhase == INIT) {
-            mActivities.starting(time);
-            if (mActivities.startingActivities().empty()) {
-                mPhase = WAIT;
-            } else {
-                mPhase = SEND;
-            }
-        } else if (mPhase == SEND) {
+        if (mPhase == SEND) {
             mPhase = WAIT;
         }
     }
@@ -93,7 +86,16 @@ public:
         vle::devs::ExternalEventList::const_iterator it = events.begin();
 
         while (it != events.end()) {
-            if ((*it)->onPort("done")) {
+            if ((*it)->onPort("start")) {
+                if (mPhase == INIT) {
+                    mActivities.starting(time);
+                    if (mActivities.startingActivities().empty()) {
+                        mPhase = WAIT;
+                    } else {
+                        mPhase = SEND;
+                    }
+                }
+            } else if ((*it)->onPort("done")) {
                 Activity* a =
                     Activity::build((*it)->getAttributeValue("activity"));
 

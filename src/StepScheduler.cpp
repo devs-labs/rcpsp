@@ -219,6 +219,8 @@ public:
                     (*it)->getAttributeValue("resources"));
                 Activity* a = mWaitingActivities.front();
 
+                a->assign(r);
+
                 std::cout << "[" << getModel().getParentName()
                           << ":" << getModelName()
                           << "] - assign = " << r->size()
@@ -232,7 +234,6 @@ public:
                 }
                 std::cout << std::endl;
 
-                a->assign(r);
                 if (a->checkResourceConstraint()) {
                     mRunningActivity = a;
                     mWaitingActivities.pop_front();

@@ -148,7 +148,8 @@ public:
                           << ": release = " << *r << std::endl;
 
                 mPool.release(r);
-//                delete r;
+                r->clear();
+                delete r;
                 mPhase = WAIT;
             }
             ++it;

@@ -76,6 +76,9 @@ public:
     virtual ~Step()
     { }
 
+    ResourceConstraints buildResourceConstraints(const Resources* r) const
+    { return mResourceConstraints.buildResourceConstraints(r); }
+
     bool checkResourceConstraint(const Resources& r) const
     { return mResourceConstraints.checkResourceConstraint(r); }
 
@@ -97,6 +100,9 @@ public:
 
     const std::string& name() const
     { return mName; }
+
+    bool needAgain(const std::string& type) const
+    { return mResourceConstraints.needAgain(type); }
 
     virtual bool operator==(const Step& s) const
     { return mName == s.mName; }

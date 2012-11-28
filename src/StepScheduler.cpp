@@ -39,6 +39,15 @@ public:
         mLocation = vle::value::toString(events.get("location"));
     }
 
+    Activity* select() const
+    {
+        if (mWaitingActivities.empty()) {
+            return 0;
+        } else {
+            return mWaitingActivities.front();
+        }
+    }
+
     vle::devs::Time init(const vle::devs::Time& /* time */)
     {
         mRunningActivity = 0;
@@ -51,19 +60,22 @@ public:
     {
         if (mPhase == SEND_DEMAND) {
             if (not mWaitingActivities.empty()) {
-                vle::devs::ExternalEvent* ee =
-                    new vle::devs::ExternalEvent("demand");
+                Activity* a = select();
+                ResourceConstraints rc = a->buildResourceConstraints();
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] at " << time
-                          << " - " << mWaitingActivities.front()->name()
-                          << " - demand" << std::endl;
+                if (not rc.empty()) {
+                    vle::devs::ExternalEvent* ee =
+                        new vle::devs::ExternalEvent("demand");
 
-                ee << vle::devs::attribute("resources",
-                    mWaitingActivities.front()->resourceConstraints().
-                                           toValue());
-                output.addEvent(ee);
+                    std::cout << "[" << getModel().getParentName()
+                              << ":" << getModelName()
+                              << "] at " << time
+                              << " - " << a->name()
+                              << " - demand" << std::endl;
+
+                    ee << vle::devs::attribute("resources", rc.toValue());
+                    output.addEvent(ee);
+                }
             }
         } else if (mPhase == SEND_PROCESS) {
             if (mRunningActivity)
@@ -71,13 +83,13 @@ public:
                 vle::devs::ExternalEvent* ee =
                     new vle::devs::ExternalEvent("process");
 
-                 std::cout << "[" << getModel().getParentName()
+                std::cout << "[" << getModel().getParentName()
                           << ":" << getModelName()
                           << "] at " << time
                           << " - " << mRunningActivity->name()
                           << " - process" << std::endl;
 
-               ee << vle::devs::attribute("activity",
+                ee << vle::devs::attribute("activity",
                                            mRunningActivity->toValue());
                 output.addEvent(ee);
             }
@@ -118,14 +130,19 @@ public:
                 std::cout << "[" << getModel().getParentName()
                           << ":" << getModelName()
                           << "] - " << (*it)->name()
-                          << " - release" << std::endl;
+                          << " - release"
+                          << " => "
+                          << *(*it)->allocatedResources()
+                          << std::endl;
 
-                {
+                Resources* releasedResources = (*it)->releasedResources();
+
+                if (not releasedResources->empty()) {
                     vle::devs::ExternalEvent* ee =
                         new vle::devs::ExternalEvent("release");
 
                     ee << vle::devs::attribute(
-                        "resources", (*it)->allocatedResources()->toValue());
+                        "resources", releasedResources->toValue());
                     output.addEvent(ee);
                 }
             }
@@ -146,7 +163,20 @@ public:
     void internalTransition(const vle::devs::Time& time)
     {
         if (mPhase == SEND_DEMAND) {
-            mPhase = WAIT;
+            Activity* a = select();
+
+            if (a->buildResourceConstraints().empty()) {
+                mRunningActivity = a;
+
+                ActivityFIFO::iterator it = std::find(
+                    mWaitingActivities.begin(),
+                    mWaitingActivities.end(), a);
+
+                mWaitingActivities.erase(it);
+                mPhase = SEND_PROCESS;
+            } else {
+                mPhase = WAIT;
+            }
         } else if (mPhase == SEND_DONE) {
             mDoneActivities.clear();
             if (mWaitingActivities.empty()) {
@@ -217,7 +247,7 @@ public:
             } else if ((*it)->onPort("assign")) {
                 Resources* r = Resources::build(
                     (*it)->getAttributeValue("resources"));
-                Activity* a = mWaitingActivities.front();
+                Activity* a = select();
 
                 a->assign(r);
 
@@ -236,7 +266,12 @@ public:
 
                 if (a->checkResourceConstraint()) {
                     mRunningActivity = a;
-                    mWaitingActivities.pop_front();
+
+                    ActivityFIFO::iterator it = std::find(
+                        mWaitingActivities.begin(),
+                        mWaitingActivities.end(), a);
+
+                    mWaitingActivities.erase(it);
                     mPhase = SEND_PROCESS;
                 }
             } else if ((*it)->onPort("done")) {

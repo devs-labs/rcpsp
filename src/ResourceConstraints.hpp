@@ -52,6 +52,8 @@ public:
     static ResourceConstraints* build(const vle::value::Value& value)
     { return new ResourceConstraints(&value); }
 
+    ResourceConstraints buildResourceConstraints(const Resources* r) const;
+
     bool checkResourceConstraint(const Resources& r) const;
 
     unsigned int quantity() const
@@ -63,6 +65,8 @@ public:
         }
         return n;
     }
+
+    bool needAgain(const std::string& type) const;
 
     vle::value::Value* toValue() const
     {

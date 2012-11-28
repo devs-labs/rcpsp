@@ -67,6 +67,15 @@ void Activity::assign(Resources* r)
     }
 }
 
+ResourceConstraints Activity::buildResourceConstraints() const
+{
+    if (mStepIterator != mSteps->end()) {
+        return (*mStepIterator)->buildResourceConstraints(mAllocatedResources);
+    } else {
+        return ResourceConstraints();
+    }
+}
+
 bool Activity::checkResourceConstraint() const
 {
     if (mStepIterator != mSteps->end()) {
@@ -92,6 +101,41 @@ void Activity::finish(const vle::devs::Time& time)
         ++mStepIterator;
     } else {
         //TODO exception
+    }
+}
+
+void Activity::release()
+{
+    if (end()) {
+        mAllocatedResources = 0;
+    } else {
+        Resources::iterator it = mAllocatedResources->begin();
+
+        while (it != mAllocatedResources->end()) {
+            if (not (*mStepIterator)->needAgain((*it)->type())) {
+                mAllocatedResources->erase(it);
+                it = mAllocatedResources->begin();
+            } else {
+                ++it;
+            }
+        }
+    }
+}
+
+Resources* Activity::releasedResources() const
+{
+    if (end()) {
+        return mAllocatedResources;
+    } else {
+        Resources* resources = new Resources;
+
+        for (Resources::const_iterator it = mAllocatedResources->begin();
+             it != mAllocatedResources->end(); ++it) {
+            if (not (*mStepIterator)->needAgain((*it)->type())) {
+                resources->push_back(*it);
+            }
+        }
+        return resources;
     }
 }
 

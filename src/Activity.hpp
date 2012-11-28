@@ -73,6 +73,8 @@ public:
     static Activity* build(const vle::value::Value& value)
     { return new Activity(&value); }
 
+    ResourceConstraints buildResourceConstraints() const;
+
     bool checkResourceConstraint() const;
 
     const Step* current() const
@@ -104,8 +106,9 @@ public:
         return *this;
     }
 
-    void release()
-    { mAllocatedResources = 0; }
+    void release();
+
+    Resources* releasedResources() const;
 
     vle::devs::Time remainingTime(const vle::devs::Time& time) const;
 

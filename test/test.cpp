@@ -67,8 +67,8 @@ BOOST_AUTO_TEST_CASE(test_step)
 
     ResourceConstraints resourceConstraints;
 
-    resourceConstraints.push_back(ResourceConstraint(Pool1.name(), 1));
-    resourceConstraints.push_back(ResourceConstraint(Pool2.name(), 1));
+    resourceConstraints.push_back(ResourceConstraint(Pool1.name(), 1, false));
+    resourceConstraints.push_back(ResourceConstraint(Pool2.name(), 1, false));
 
     Step step("a1_1", 10, L1, resourceConstraints,
               TemporalConstraints(TemporalConstraints::NONE,

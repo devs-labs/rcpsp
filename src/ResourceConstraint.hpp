@@ -35,8 +35,8 @@ namespace rcpsp {
 class ResourceConstraint
 {
 public:
-    ResourceConstraint(const std::string& type, int quantity) :
-        mType(type), mQuantity(quantity)
+    ResourceConstraint(const std::string& type, int quantity, bool same) :
+        mType(type), mQuantity(quantity), mSame(same)
     { }
 
     ResourceConstraint(const vle::value::Value* value)
@@ -46,11 +46,17 @@ public:
 
         mType = vle::value::toString(set->get(0));
         mQuantity = vle::value::toInteger(set->get(1));
+        if (set->size() == 3) {
+            mSame = vle::value::toBoolean(set->get(2));
+        } else {
+            mSame = false;
+        }
     }
 
     ResourceConstraint(const ResourceConstraint& rc) :
         mType(rc.mType),
-        mQuantity(rc.mQuantity)
+        mQuantity(rc.mQuantity),
+        mSame(rc.mSame)
     { }
 
     unsigned int quantity() const
@@ -69,8 +75,12 @@ public:
 
         value->add(new vle::value::String(mType));
         value->add(new vle::value::Integer(mQuantity));
+        value->add(new vle::value::Boolean(mSame));
         return value;
     }
+
+    bool same() const
+    { return mSame; }
 
     const std::string& type() const
     { return mType; }
@@ -78,6 +88,7 @@ public:
 private:
     std::string mType;
     unsigned int mQuantity;
+    bool mSame;
 };
 
 } // namespace rcpsp

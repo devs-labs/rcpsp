@@ -101,11 +101,11 @@
 </submodels>
 <connections>
 <connection type="output">
- <origin model="pool_1" port="assign" />
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="output">
- <origin model="pool_2" port="assign" />
+ <origin model="pool_1" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">
@@ -118,27 +118,27 @@
 </connection>
 <connection type="internal">
  <origin model="assignment" port="assign" />
- <destination model="pool_1" port="assign" />
-</connection>
-<connection type="internal">
- <origin model="assignment" port="assign" />
  <destination model="pool_2" port="assign" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="demand" />
- <destination model="pool_1" port="demand" />
+ <origin model="assignment" port="assign" />
+ <destination model="pool_1" port="assign" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="demand" />
  <destination model="pool_2" port="demand" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="release" />
- <destination model="pool_1" port="release" />
+ <origin model="assignment" port="demand" />
+ <destination model="pool_1" port="demand" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="release" />
  <destination model="pool_2" port="release" />
+</connection>
+<connection type="internal">
+ <origin model="assignment" port="release" />
+ <destination model="pool_1" port="release" />
 </connection>
 <connection type="internal">
  <origin model="pool_1" port="available" />
@@ -425,11 +425,11 @@
 </submodels>
 <connections>
 <connection type="output">
- <origin model="pool_2" port="assign" />
+ <origin model="pool_1" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="output">
- <origin model="pool_1" port="assign" />
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">
@@ -442,27 +442,27 @@
 </connection>
 <connection type="internal">
  <origin model="assignment" port="assign" />
- <destination model="pool_2" port="assign" />
-</connection>
-<connection type="internal">
- <origin model="assignment" port="assign" />
  <destination model="pool_1" port="assign" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="demand" />
- <destination model="pool_2" port="demand" />
+ <origin model="assignment" port="assign" />
+ <destination model="pool_2" port="assign" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="demand" />
  <destination model="pool_1" port="demand" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="release" />
- <destination model="pool_2" port="release" />
+ <origin model="assignment" port="demand" />
+ <destination model="pool_2" port="demand" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="release" />
  <destination model="pool_1" port="release" />
+</connection>
+<connection type="internal">
+ <origin model="assignment" port="release" />
+ <destination model="pool_2" port="release" />
 </connection>
 <connection type="internal">
  <origin model="pool_1" port="available" />
@@ -587,11 +587,11 @@
 </submodels>
 <connections>
 <connection type="output">
- <origin model="pool_2" port="assign" />
+ <origin model="pool_1" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="output">
- <origin model="pool_1" port="assign" />
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">
@@ -604,27 +604,27 @@
 </connection>
 <connection type="internal">
  <origin model="assignment" port="assign" />
- <destination model="pool_2" port="assign" />
-</connection>
-<connection type="internal">
- <origin model="assignment" port="assign" />
  <destination model="pool_1" port="assign" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="demand" />
- <destination model="pool_2" port="demand" />
+ <origin model="assignment" port="assign" />
+ <destination model="pool_2" port="assign" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="demand" />
  <destination model="pool_1" port="demand" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="release" />
- <destination model="pool_2" port="release" />
+ <origin model="assignment" port="demand" />
+ <destination model="pool_2" port="demand" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="release" />
  <destination model="pool_1" port="release" />
+</connection>
+<connection type="internal">
+ <origin model="assignment" port="release" />
+ <destination model="pool_2" port="release" />
 </connection>
 <connection type="internal">
  <origin model="pool_1" port="available" />
@@ -680,7 +680,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_1" port="schedule" />
- <destination model="location_4" port="schedule" />
+ <destination model="location_2" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_1" port="schedule" />
@@ -688,7 +688,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_1" port="schedule" />
- <destination model="location_2" port="schedule" />
+ <destination model="location_4" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_2" port="done" />
@@ -696,7 +696,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_2" port="schedule" />
- <destination model="location_4" port="schedule" />
+ <destination model="location_3" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_2" port="schedule" />
@@ -704,7 +704,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_2" port="schedule" />
- <destination model="location_3" port="schedule" />
+ <destination model="location_4" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_3" port="done" />
@@ -712,7 +712,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_3" port="schedule" />
- <destination model="location_4" port="schedule" />
+ <destination model="location_2" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_3" port="schedule" />
@@ -720,7 +720,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_3" port="schedule" />
- <destination model="location_2" port="schedule" />
+ <destination model="location_4" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_4" port="done" />
@@ -728,7 +728,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_4" port="schedule" />
- <destination model="location_1" port="schedule" />
+ <destination model="location_2" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_4" port="schedule" />
@@ -736,7 +736,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_4" port="schedule" />
- <destination model="location_2" port="schedule" />
+ <destination model="location_1" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="scheduler" port="location_1" />
@@ -955,7 +955,7 @@
 <conditions>
 <condition name="cond_activity_scheduler" >
  <port name="activities" >
-<set><set><string>A1</string><set><set><string>A1_1</string><double>10.000000000000000</double><string>location_1</string><set><set><string>R1</string><integer>3</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A1_2</string><double>10.000000000000000</double><string>location_2</string><set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A1_3</string><double>10.000000000000000</double><string>location_4</string><set><set><string>R2</string><integer>1</integer></set><set><string>R1</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A2</string><set><set><string>A2_1</string><double>5.000000000000000</double><string>location_2</string><set><set><string>R1</string><integer>1</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A3</string><set><set><string>A3_1</string><double>8.000000000000000</double><string>location_3</string><set><set><string>R1</string><integer>1</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A4</string><set><set><string>A4_1</string><double>2.000000000000000</double><string>location_4</string><set><set><string>R1</string><integer>1</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A5</string><set><set><string>A5_1</string><double>13.000000000000000</double><string>location_2</string><set><set><string>R1</string><integer>1</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set>
+<set><set><string>A1</string><set><set><string>A1_1</string><double>10.000000000000000</double><string>location_1</string><set><set><string>R1</string><integer>3</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A1_2</string><double>10.000000000000000</double><string>location_2</string><set><set><string>R2</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A1_3</string><double>10.000000000000000</double><string>location_4</string><set><set><string>R2</string><integer>1</integer></set><set><string>R1</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A2</string><set><set><string>A2_1</string><double>5.000000000000000</double><string>location_2</string><set><set><string>R1</string><integer>1</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A3</string><set><set><string>A3_1</string><double>8.000000000000000</double><string>location_3</string><set><set><string>R1</string><integer>1</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A4</string><set><set><string>A4_1</string><double>2.000000000000000</double><string>location_4</string><set><set><string>R1</string><integer>1</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A5</string><set><set><string>A5_1</string><double>13.000000000000000</double><string>location_2</string><set><set><string>R1</string><integer>1</integer></set><set><string>R2</string><integer>1</integer></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set>
 </port>
 </condition>
 <condition name="cond_constructor" >

@@ -25,6 +25,31 @@
 
 namespace rcpsp {
 
+ResourceConstraints ResourceConstraints::buildResourceConstraints(
+    const Resources* r) const
+{
+    ResourceConstraints rc;
+    std::map < std::string, int > resourceQuantity;
+
+    for (const_iterator it = begin(); it != end(); ++it) {
+        resourceQuantity[it->type()] = it->quantity();
+    }
+
+    if (r) {
+        for (Resources::const_iterator it = r->begin(); it != r->end(); ++it) {
+            --resourceQuantity[(*it)->type()];
+        }
+    }
+
+    for (std::map < std::string, int >::const_iterator it =
+             resourceQuantity.begin(); it != resourceQuantity.end(); ++it) {
+        if (it->second > 0) {
+            rc.push_back(ResourceConstraint(it->first, it->second, false));
+        }
+    }
+    return rc;
+}
+
 bool ResourceConstraints::checkResourceConstraint(const Resources& r) const
 {
     bool ok = true;
@@ -42,6 +67,16 @@ bool ResourceConstraints::checkResourceConstraint(const Resources& r) const
         ok = it->second == 0;
     }
     return ok;
+}
+
+bool ResourceConstraints::needAgain(const std::string& type) const
+{
+    bool yes = false;
+
+    for (const_iterator it = begin(); it != end() and not yes; ++it) {
+        yes = it->type() == type and it->same();
+    }
+    return yes;
 }
 
 } // namespace rcpsp

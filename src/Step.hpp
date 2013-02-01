@@ -27,7 +27,7 @@
 #include <ostream>
 #include <string>
 
-#include <vle/value.hpp>
+#include <vle/value/Value.hpp>
 
 #include <Location.hpp>
 #include <ResourceConstraints.hpp>
@@ -51,8 +51,8 @@ public:
         mWaiting(false),
         mRunning(false),
         mDone(false),
-        mStartDate(vle::devs::Time::infinity),
-        mFinishDate(vle::devs::Time::infinity)
+        mStartDate(vle::devs::infinity),
+        mFinishDate(vle::devs::infinity)
     { }
 
     Step(const vle::value::Value* value)
@@ -69,8 +69,8 @@ public:
         mWaiting = false;
         mRunning = false;
         mDone = false;
-        mStartDate = vle::devs::Time::infinity;
-        mFinishDate = vle::devs::Time::infinity;
+        mStartDate = vle::devs::infinity;
+        mFinishDate = vle::devs::infinity;
     }
 
     virtual ~Step()

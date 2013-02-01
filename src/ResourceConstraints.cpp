@@ -23,6 +23,8 @@
 
 #include <ResourceConstraints.hpp>
 
+#include <map>
+
 namespace rcpsp {
 
 ResourceConstraints ResourceConstraints::buildResourceConstraints(

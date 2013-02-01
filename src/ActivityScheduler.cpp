@@ -43,7 +43,7 @@ public:
     vle::devs::Time init(const vle::devs::Time& /* time */)
     {
         mPhase = INIT;
-        return vle::devs::Time::infinity;
+        return vle::devs::infinity;
     }
 
     void output(const vle::devs::Time& /* time */,
@@ -69,7 +69,7 @@ public:
     vle::devs::Time timeAdvance() const
     {
         if (mPhase == SEND) return 0;
-        else return vle::devs::Time::infinity;
+        else return vle::devs::infinity;
     }
 
     void internalTransition(const vle::devs::Time& /* time */)
@@ -121,4 +121,4 @@ private:
 
 } // namespace rcpsp
 
-DECLARE_NAMED_DYNAMICS(ActivityScheduler, rcpsp::ActivityScheduler);
+DECLARE_DYNAMICS(rcpsp::ActivityScheduler);

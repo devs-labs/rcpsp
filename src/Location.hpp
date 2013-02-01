@@ -27,7 +27,8 @@
 #include <string>
 #include <vector>
 
-#include <vle/value.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Value.hpp>
 
 namespace rcpsp {
 

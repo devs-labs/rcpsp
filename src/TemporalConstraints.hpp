@@ -27,7 +27,9 @@
 #include <string>
 
 #include <vle/devs/Time.hpp>
-#include <vle/value.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Value.hpp>
 
 namespace rcpsp {
 

@@ -43,7 +43,7 @@ public:
         mAvailableResourceNumber = 0;
         mReleasedResources = 0;
         mPhase = WAIT;
-        return vle::devs::Time::infinity;
+        return vle::devs::infinity;
     }
 
     void output(const vle::devs::Time& /* time */,
@@ -93,7 +93,7 @@ public:
             mPhase == SEND_RELEASE) {
             return 0;
         } else {
-            return vle::devs::Time::infinity;
+            return vle::devs::infinity;
         }
     }
 
@@ -183,4 +183,4 @@ private:
 
 } // namespace rcpsp
 
-DECLARE_NAMED_DYNAMICS(Assignment, rcpsp::Assignment);
+DECLARE_DYNAMICS(rcpsp::Assignment);

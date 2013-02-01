@@ -38,10 +38,10 @@ BOOST_AUTO_TEST_CASE(test_activity)
 {
     Activity activity("A1",
                       TemporalConstraints(TemporalConstraints::NONE,
-                                          vle::devs::Time::negativeInfinity,
-                                          vle::devs::Time::infinity,
-                                          vle::devs::Time::negativeInfinity,
-                                          vle::devs::Time::infinity));
+                                          vle::devs::negativeInfinity,
+                                          vle::devs::infinity,
+                                          vle::devs::negativeInfinity,
+                                          vle::devs::infinity));
 }
 
 BOOST_AUTO_TEST_CASE(test_step)
@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE(test_step)
 
     Step step("a1_1", 10, L1, resourceConstraints,
               TemporalConstraints(TemporalConstraints::NONE,
-                                  vle::devs::Time::negativeInfinity,
-                                  vle::devs::Time::infinity,
-                                  vle::devs::Time::negativeInfinity,
-                                  vle::devs::Time::infinity));
+                                  vle::devs::negativeInfinity,
+                                  vle::devs::infinity,
+                                  vle::devs::negativeInfinity,
+                                  vle::devs::infinity));
 }

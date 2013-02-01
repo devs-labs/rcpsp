@@ -42,7 +42,7 @@ public:
         mAvailable = false;
         mDeliveredResources = 0;
         mPhase = WAIT;
-        return vle::devs::Time::infinity;
+        return vle::devs::infinity;
     }
 
     void output(const vle::devs::Time& /* time */,
@@ -82,7 +82,7 @@ public:
         if (mPhase == SEND_ASSIGN or mPhase == SEND_AVAILABLE) {
             return 0;
         } else {
-            return vle::devs::Time::infinity;
+            return vle::devs::infinity;
         }
     }
 
@@ -183,4 +183,4 @@ private:
 
 } // namespace rcpsp
 
-DECLARE_NAMED_DYNAMICS(Pool, rcpsp::Pool);
+DECLARE_DYNAMICS(rcpsp::Pool);

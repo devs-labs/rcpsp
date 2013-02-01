@@ -25,13 +25,13 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_activity_scheduler" library="rcpsp" model="ActivityScheduler" package="rcpsp" type="local"  />
-<dynamic name="dyn_assignment" library="rcpsp" model="Assignment" package="rcpsp" type="local"  />
-<dynamic name="dyn_constructor" library="rcpsp" model="Constructor" package="rcpsp" type="local"  />
-<dynamic name="dyn_pool" library="rcpsp" model="Pool" package="rcpsp" type="local"  />
-<dynamic name="dyn_pool_constructor" library="rcpsp" model="PoolConstructor" package="rcpsp" type="local"  />
-<dynamic name="dyn_processor" library="rcpsp" model="Processor" package="rcpsp" type="local"  />
-<dynamic name="dyn_step_scheduler" library="rcpsp" model="StepScheduler" package="rcpsp" type="local"  />
+<dynamic name="dyn_activity_scheduler" library="ActivityScheduler" package="rcpsp" type="local"  />
+<dynamic name="dyn_assignment" library="Assignment" package="rcpsp" type="local"  />
+<dynamic name="dyn_constructor" library="Constructor" package="rcpsp" type="local"  />
+<dynamic name="dyn_pool" library="Pool" package="rcpsp" type="local"  />
+<dynamic name="dyn_pool_constructor" library="PoolConstructor" package="rcpsp" type="local"  />
+<dynamic name="dyn_processor" library="Processor" package="rcpsp" type="local"  />
+<dynamic name="dyn_step_scheduler" library="StepScheduler" package="rcpsp" type="local"  />
 </dynamics>
 <classes>
 <class name="Location" >
@@ -179,22 +179,22 @@
 </conditions>
 <views>
 <outputs>
-<output name="view_available_resources" location="" format="local" plugin="file" >
+<output name="view_available_resources" location="" format="local" package="vle.output" plugin="file" >
 <map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
 
-<output name="view_running_activity" location="" format="local" plugin="file" >
+<output name="view_running_activity" location="" format="local" package="vle.output" plugin="file" >
 <map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
 
-<output name="view_running_step" location="" format="local" plugin="file" >
+<output name="view_running_step" location="" format="local" package="vle.output" plugin="file" >
 <map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
 
-<output name="view_used_resource_types" location="" format="local" plugin="file" >
+<output name="view_used_resource_types" location="" format="local" package="vle.output" plugin="file" >
 <map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
 
-<output name="view_used_resources" location="" format="local" plugin="file" >
+<output name="view_used_resources" location="" format="local" package="vle.output" plugin="file" >
 <map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
 
-<output name="view_waiting" location="" format="local" plugin="file" >
+<output name="view_waiting" location="" format="local" package="vle.output" plugin="file" >
 <map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
 
 </outputs>

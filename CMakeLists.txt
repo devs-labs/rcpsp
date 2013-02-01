@@ -36,7 +36,7 @@ ENDIF(UNIX AND NOT WIN32)
 ##
 
 FIND_PACKAGE(PkgConfig REQUIRED)
-PKG_CHECK_MODULES(VLE vle-1.0)
+PKG_CHECK_MODULES(VLE vle-1.1)
 
 ##
 ## Find boost
@@ -49,6 +49,18 @@ FIND_PACKAGE(Boost COMPONENTS unit_test_framework date_time)
 IF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
   SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
 ENDIF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
+
+##
+## Define function to simplify the definition of simulations plugins.
+##
+
+FUNCTION(DeclareDevsDynamics name sources)
+  ADD_LIBRARY(${name} MODULE ${sources})
+  TARGET_LINK_LIBRARIES(${name} ${VLE_LIBRARIES})
+  INSTALL(TARGETS ${name}
+    RUNTIME DESTINATION plugins/simulator
+    LIBRARY DESTINATION plugins/simulator)
+ENDFUNCTION(DeclareDevsDynamics name sources)
 
 ##
 ## Generate the doxygen

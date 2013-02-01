@@ -26,7 +26,7 @@
 
 #include <string>
 #include <vle/devs/Time.hpp>
-#include <vle/value.hpp>
+#include <vle/value/Value.hpp>
 
 #include <Resource.hpp>
 

@@ -1,5 +1,5 @@
 /**
- * @file Beep.cpp
+ * @file ActivityPilot.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -25,26 +25,59 @@
 
 namespace rcpsp {
 
-class Beep : public vle::devs::Dynamics
+class ActivityPilot : public vle::devs::Dynamics
 {
 public:
-    Beep(const vle::devs::DynamicsInit& init,
-         const vle::devs::InitEventList& events) :
+    ActivityPilot(const vle::devs::DynamicsInit& init,
+                  const vle::devs::InitEventList& events) :
         vle::devs::Dynamics(init, events)
     {
     }
 
     vle::devs::Time init(const vle::devs::Time& /* time */)
-    { return 0.0; }
-
-    vle::devs::Time timeAdvance() const
-    { return vle::devs::infinity; }
+    {
+        return vle::devs::infinity;
+    }
 
     void output(const vle::devs::Time& /* time */,
                 vle::devs::ExternalEventList& output) const
-    { output.addEvent(buildEvent("out")); }
+    {
+    }
+
+    vle::devs::Time timeAdvance() const
+    {
+        return vle::devs::infinity;
+    }
+
+    void internalTransition(const vle::devs::Time& /* time */)
+    {
+    }
+
+    void externalTransition(
+        const vle::devs::ExternalEventList& events,
+        const vle::devs::Time& time)
+    {
+        vle::devs::ExternalEventList::const_iterator it = events.begin();
+
+        while (it != events.end()) {
+            if ((*it)->onPort("start")) {
+            }
+            ++it;
+        }
+    }
+
+    virtual vle::value::Value* observation(
+        const vle::devs::ObservationEvent& event) const
+    {
+        return 0;
+    }
+
+private:
+    enum Phase { INIT, RUN, DONE };
+
+    Phase mPhase;
 };
 
 } // namespace rcpsp
 
-DECLARE_DYNAMICS(rcpsp::Beep);
+DECLARE_DYNAMICS(rcpsp::ActivityPilot);

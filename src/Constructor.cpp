@@ -92,7 +92,7 @@ public:
 
     vle::devs::Time timeAdvance() const
     {
-        return vle::devs::Time::infinity;
+        return vle::devs::infinity;
     }
 
     void internalTransition(const vle::devs::Time& /* time */)
@@ -107,4 +107,4 @@ private:
 
 } // namespace rcpsp
 
-DECLARE_NAMED_EXECUTIVE(Constructor, rcpsp::Constructor);
+DECLARE_EXECUTIVE(rcpsp::Constructor);

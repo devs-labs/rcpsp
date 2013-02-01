@@ -52,7 +52,7 @@ public:
     {
         mRunningActivity = 0;
         mPhase = WAIT;
-        return vle::devs::Time::infinity;
+        return vle::devs::infinity;
     }
 
     void output(const vle::devs::Time& time,
@@ -156,7 +156,7 @@ public:
             mPhase == SEND_SCHEDULE) {
             return 0;
         } else {
-            return vle::devs::Time::infinity;
+            return vle::devs::infinity;
         }
     }
 
@@ -316,4 +316,4 @@ private:
 
 } // namespace rcpsp
 
-DECLARE_NAMED_DYNAMICS(StepScheduler, rcpsp::StepScheduler);
+DECLARE_DYNAMICS(rcpsp::StepScheduler);

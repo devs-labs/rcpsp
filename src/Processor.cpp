@@ -39,8 +39,8 @@ public:
     vle::devs::Time init(const vle::devs::Time& /* time */)
     {
         mPhase = IDLE;
-        mSigma = vle::devs::Time::infinity;
-        return vle::devs::Time::infinity;
+        mSigma = vle::devs::infinity;
+        return vle::devs::infinity;
     }
 
     void output(const vle::devs::Time& /* time */,
@@ -61,7 +61,7 @@ public:
     vle::devs::Time timeAdvance() const
     {
         if (mPhase == IDLE) {
-            return vle::devs::Time::infinity;
+            return vle::devs::infinity;
         } else if (mPhase == RUNNING) {
             return mSigma;
         } else {
@@ -195,7 +195,7 @@ public:
 private:
     void computeRemainingTime(const vle::devs::Time& time)
     {
-        vle::devs::Time min = vle::devs::Time::infinity;
+        vle::devs::Time min = vle::devs::infinity;
 
         for(Activities::const_iterator it = mRunningActivities.begin();
             it != mRunningActivities.end(); ++it) {
@@ -218,4 +218,4 @@ private:
 
 } // namespace rcpsp
 
-DECLARE_NAMED_DYNAMICS(Processor, rcpsp::Processor);
+DECLARE_DYNAMICS(rcpsp::Processor);

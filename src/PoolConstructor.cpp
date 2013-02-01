@@ -80,7 +80,7 @@ public:
              it != mPools.pools().end(); ++it) {
             createPool(it->first, it->second);
         }
-        return vle::devs::Time::infinity;
+        return vle::devs::infinity;
     }
 
 private:
@@ -89,4 +89,4 @@ private:
 
 } // namespace rcpsp
 
-DECLARE_NAMED_EXECUTIVE(PoolConstructor, rcpsp::PoolConstructor);
+DECLARE_EXECUTIVE(rcpsp::PoolConstructor);

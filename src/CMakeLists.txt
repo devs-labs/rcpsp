@@ -7,21 +7,13 @@ LINK_DIRECTORIES(
   ${VLE_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(rcpsp SHARED Activities.hpp Activities.cpp Activity.hpp
-  Activity.cpp ActivityScheduler.cpp Assignment.cpp Beep.cpp Constructor.cpp
-  Location.hpp
-  Planning.hpp Pool.cpp PoolConstructor.cpp PrecedenceConstraint.hpp
-  PrecedencesGraph.hpp Processor.cpp Resource.hpp Resource.cpp Resources.hpp
-  Resources.cpp ResourceConstraint.hpp ResourceConstraints.hpp
-  ResourceConstraints.cpp ResourcePool.hpp TemporalConstraints.hpp
-  TemporalConstraints.cpp Step.hpp Step.cpp StepScheduler.cpp Steps.hpp
-  Steps.cpp)
-
-TARGET_LINK_LIBRARIES(rcpsp
-  ${VLE_LIBRARIES}
-  ${Boost_LIBRARIES})
-
-INSTALL(TARGETS rcpsp
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+DeclareDevsDynamics(ActivityPilot "ActivityPilot.cpp")
+DeclareDevsDynamics(ActivityScheduler "ActivityScheduler.cpp;Activities.hpp;Activities.cpp;Activity.hpp;Activity.cpp;Location.hpp;Planning.hpp;PrecedencesGraph.hpp;Resource.hpp;Resource.cpp;ResourceConstraint.hpp;ResourceConstraints.hpp;ResourceConstraints.cpp;Resources.hpp;Resources.cpp;Step.hpp;Step.cpp;Steps.hpp;Steps.cpp;TemporalConstraints.hpp;TemporalConstraints.cpp")
+DeclareDevsDynamics(Assignment "Assignment.cpp;Activities.hpp;Activities.cpp;Activity.hpp;Activity.cpp;Location.hpp;Planning.hpp;PrecedencesGraph.hpp;Resource.hpp;Resource.cpp;ResourceConstraint.hpp;ResourceConstraints.hpp;ResourceConstraints.cpp;Resources.hpp;Resources.cpp;Step.hpp;Step.cpp;Steps.hpp;Steps.cpp;TemporalConstraints.hpp;TemporalConstraints.cpp")
+DeclareDevsDynamics(Beep "Beep.cpp")
+DeclareDevsDynamics(Constructor "Constructor.cpp;Activities.hpp;Activities.cpp;Activity.hpp;Activity.cpp;Location.hpp;Planning.hpp;PrecedencesGraph.hpp;Resource.hpp;Resource.cpp;ResourceConstraint.hpp;ResourceConstraints.hpp;ResourceConstraints.cpp;Resources.hpp;Resources.cpp;Step.hpp;Step.cpp;Steps.hpp;Steps.cpp;TemporalConstraints.hpp;TemporalConstraints.cpp")
+DeclareDevsDynamics(Dispatcher "Dispatcher.cpp;Activities.hpp;Activities.cpp;Activity.hpp;Activity.cpp;Location.hpp;Planning.hpp;PrecedencesGraph.hpp;Resource.hpp;Resource.cpp;ResourceConstraint.hpp;ResourceConstraints.hpp;ResourceConstraints.cpp;Resources.hpp;Resources.cpp;Step.hpp;Step.cpp;Steps.hpp;Steps.cpp;TemporalConstraints.hpp;TemporalConstraints.cpp")
+DeclareDevsDynamics(PoolConstructor "PoolConstructor.cpp;Activities.hpp;Activities.cpp;Activity.hpp;Activity.cpp;Location.hpp;Planning.hpp;PrecedencesGraph.hpp;Resource.hpp;Resource.cpp;ResourceConstraint.hpp;ResourceConstraints.hpp;ResourceConstraints.cpp;Resources.hpp;Resources.cpp;Step.hpp;Step.cpp;Steps.hpp;Steps.cpp;TemporalConstraints.hpp;TemporalConstraints.cpp")
+DeclareDevsDynamics(Pool "Pool.cpp;Activities.hpp;Activities.cpp;Activity.hpp;Activity.cpp;Location.hpp;Planning.hpp;PrecedencesGraph.hpp;Resource.hpp;Resource.cpp;ResourceConstraint.hpp;ResourceConstraints.hpp;ResourceConstraints.cpp;Resources.hpp;Resources.cpp;Step.hpp;Step.cpp;Steps.hpp;Steps.cpp;TemporalConstraints.hpp;TemporalConstraints.cpp")
+DeclareDevsDynamics(Processor "Processor.cpp;Activities.hpp;Activities.cpp;Activity.hpp;Activity.cpp;Location.hpp;Planning.hpp;PrecedencesGraph.hpp;Resource.hpp;Resource.cpp;ResourceConstraint.hpp;ResourceConstraints.hpp;ResourceConstraints.cpp;Resources.hpp;Resources.cpp;Step.hpp;Step.cpp;Steps.hpp;Steps.cpp;TemporalConstraints.hpp;TemporalConstraints.cpp")
+DeclareDevsDynamics(StepScheduler "StepScheduler.cpp;Activities.hpp;Activities.cpp;Activity.hpp;Activity.cpp;Location.hpp;Planning.hpp;PrecedencesGraph.hpp;Resource.hpp;Resource.cpp;ResourceConstraint.hpp;ResourceConstraints.hpp;ResourceConstraints.cpp;Resources.hpp;Resources.cpp;Step.hpp;Step.cpp;Steps.hpp;Steps.cpp;TemporalConstraints.hpp;TemporalConstraints.cpp")

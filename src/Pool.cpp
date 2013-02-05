@@ -23,6 +23,8 @@
 
 #include <vle/devs/Dynamics.hpp>
 
+#include <vle/utils/Trace.hpp>
+
 #include <ResourcePool.hpp>
 
 namespace rcpsp {
@@ -45,18 +47,16 @@ public:
         return vle::devs::infinity;
     }
 
-    void output(const vle::devs::Time& /* time */,
+    void output(const vle::devs::Time& time,
                 vle::devs::ExternalEventList& output) const
     {
         if (mPhase == SEND_AVAILABLE) {
             vle::devs::ExternalEvent* ee =
                 new vle::devs::ExternalEvent("available");
 
-            std::cout << "[" << getModel().getParentName()
-                      << ":" << getModelName()
-                      << "] - " << mPool.type()
-                      << ": send available = " << mAvailableNumber
-                      << std::endl;
+            TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% send available: %5%")
+                       % getModel().getParentName() % getModelName() %
+                       time % mPool.type() % mAvailableNumber);
 
             ee << vle::devs::attribute("available", mAvailable);
             ee << vle::devs::attribute("number", mAvailableNumber);
@@ -65,11 +65,9 @@ public:
             vle::devs::ExternalEvent* ee =
                 new vle::devs::ExternalEvent("assign");
 
-            std::cout << "[" << getModel().getParentName()
-                      << ":" << getModelName()
-                      << "] - " << mPool.type()
-                      << ": send assign = " << mDeliveredResources->size()
-                      << std::endl;
+            TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% send assign: %5%")
+                       % getModel().getParentName() % getModelName() %
+                       time % mPool.type() % mDeliveredResources->size());
 
             ee << vle::devs::attribute("resources",
                                        mDeliveredResources->toValue());
@@ -110,11 +108,11 @@ public:
                 if (mPool.type() == (*it)->getStringAttributeValue("type")) {
                     int quantity = (*it)->getIntegerAttributeValue("quantity");
 
-                    std::cout << "[" << getModel().getParentName()
-                              << ":" << getModelName()
-                              << "] - " << mPool.type()
-                              << ": assign = " << quantity
-                              << "/" << mPool.quantity() << std::endl;
+                    TraceModel(vle::fmt(
+                                   " [%1%:%2%] at %3% -> %4% assign: %5% / %6%")
+                               % getModel().getParentName() % getModelName() %
+                               time % mPool.type() % quantity %
+                               mPool.quantity());
 
                     mDeliveredResources = mPool.assign(quantity);
                     mPhase = SEND_ASSIGN;
@@ -123,11 +121,11 @@ public:
                 if (mPool.type() == (*it)->getStringAttributeValue("type")) {
                     int quantity = (*it)->getIntegerAttributeValue("quantity");
 
-                    std::cout << "[" << getModel().getParentName()
-                              << ":" << getModelName()
-                              << "] - " << mPool.type()
-                              << ": demand = " << quantity
-                              << "/" << mPool.quantity() << std::endl;
+                    TraceModel(vle::fmt(
+                                   " [%1%:%2%] at %3% -> %4% demand: %5% / %6%")
+                               % getModel().getParentName() % getModelName() %
+                               time % mPool.type() % quantity %
+                               mPool.quantity());
 
                     if (quantity <= mPool.quantity()) {
                         mAvailable = true;
@@ -142,10 +140,10 @@ public:
                 Resources* r = Resources::build(
                     (*it)->getAttributeValue("resources"));
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] - " << mPool.type()
-                          << ": release = " << *r << std::endl;
+                TraceModel(vle::fmt(
+                               " [%1%:%2%] at %3% -> %4% release: %5%")
+                           % getModel().getParentName() % getModelName() %
+                           time % mPool.type() % *r);
 
                 mPool.release(r);
                 r->clear();

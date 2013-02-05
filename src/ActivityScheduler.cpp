@@ -21,9 +21,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
 #include <vle/devs/Dynamics.hpp>
+
+#include <vle/utils/Trace.hpp>
 
 #include <Activity.hpp>
 #include <PrecedencesGraph.hpp>
@@ -99,9 +99,9 @@ public:
                 Activity* a =
                     Activity::build((*it)->getAttributeValue("activity"));
 
-                std::cout << getModelName() << " -> "
-                          << time << ": " << a->name() << " DONE"
-                          << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% DONE") %
+                           getModel().getParentName() % getModelName() %
+                           time % a->name());
 
                 mDoneActivities.push_back(a);
             }

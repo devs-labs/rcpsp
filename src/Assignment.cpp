@@ -23,6 +23,8 @@
 
 #include <vle/devs/Dynamics.hpp>
 
+#include <vle/utils/Trace.hpp>
+
 #include <Resources.hpp>
 #include <ResourceConstraints.hpp>
 
@@ -46,7 +48,7 @@ public:
         return vle::devs::infinity;
     }
 
-    void output(const vle::devs::Time& /* time */,
+    void output(const vle::devs::Time& time,
                 vle::devs::ExternalEventList& output) const
     {
         if (mPhase == SEND_ASSIGN) {
@@ -67,11 +69,9 @@ public:
                 vle::devs::ExternalEvent* ee =
                     new vle::devs::ExternalEvent("demand");
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] - demand => "
-                          << it->type() << " = " << it->quantity()
-                          << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> demand: %4% = %5%") %
+                           getModel().getParentName() % getModelName() %
+                           time % it->type() % it->quantity());
 
                 ee << vle::devs::attribute("type", it->type());
                 ee << vle::devs::attribute("quantity", (int)it->quantity());
@@ -128,11 +128,10 @@ public:
                     mAvailableResourceNumber += number;
                 }
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] - available = " << mAvailableResourceNumber
-                          << "/" << mResourceConstraints->quantity()
-                          << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> available: %4% / %5%")
+                           % getModel().getParentName() % getModelName() %
+                           time % mAvailableResourceNumber %
+                           mResourceConstraints->quantity());
 
                 if (mAvailableResourceNumber ==
                     mResourceConstraints->quantity()) {
@@ -145,20 +144,18 @@ public:
                     ResourceConstraints::build(
                         (*it)->getAttributeValue("resources"));
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] - demand = " << mResourceConstraints->quantity()
-                          << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> demand: %4%") %
+                           getModel().getParentName() % getModelName() %
+                           time % mResourceConstraints->quantity());
 
                 mPhase = SEND_DEMAND;
             } else if ((*it)->onPort("release")) {
                 mReleasedResources = Resources::build(
                     (*it)->getAttributeValue("resources"));
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] - release = "
-                          << *mReleasedResources << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> release: %4%") %
+                           getModel().getParentName() % getModelName() %
+                           time % *mReleasedResources);
 
                 mPhase = SEND_RELEASE;
             }

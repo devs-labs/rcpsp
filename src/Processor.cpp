@@ -23,6 +23,8 @@
 
 #include <vle/devs/Dynamics.hpp>
 
+#include <vle/utils/Trace.hpp>
+
 #include <Activities.hpp>
 
 namespace rcpsp {
@@ -77,9 +79,9 @@ public:
             while (it != mRunningActivities.end()) {
                 if ((*it)->done(time)) {
 
-                    std::cout << getModel().getParentName() << " -> "
-                              << time << ": " << (*it)->name() << " finishs"
-                              << std::endl;
+                    TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% finishs") %
+                               getModel().getParentName() % getModelName() %
+                               time % (*it)->name());
 
                     (*it)->finish(time);
                     mDoneActivities.push_back(*it);
@@ -112,9 +114,9 @@ public:
                 Activity* a =
                     Activity::build((*it)->getAttributeValue("activity"));
 
-                std::cout << getModel().getParentName() << " -> "
-                          << time << ": " << a->name() << " starts"
-                          << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% starts") %
+                           getModel().getParentName() % getModelName() %
+                           time % a->name());
 
                 a->start(time);
                 mRunningActivities.push_back(a);

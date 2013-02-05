@@ -21,9 +21,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
 #include <vle/devs/Dynamics.hpp>
+
+#include <vle/utils/Trace.hpp>
 
 #include <Activities.hpp>
 
@@ -67,11 +67,9 @@ public:
                     vle::devs::ExternalEvent* ee =
                         new vle::devs::ExternalEvent("demand");
 
-                    std::cout << "[" << getModel().getParentName()
-                              << ":" << getModelName()
-                              << "] at " << time
-                              << " - " << a->name()
-                              << " - demand" << std::endl;
+                    TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% - demand") %
+                               getModel().getParentName() % getModelName() %
+                               time % a->name());
 
                     ee << vle::devs::attribute("resources", rc.toValue());
                     output.addEvent(ee);
@@ -83,11 +81,9 @@ public:
                 vle::devs::ExternalEvent* ee =
                     new vle::devs::ExternalEvent("process");
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] at " << time
-                          << " - " << mRunningActivity->name()
-                          << " - process" << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% - process") %
+                           getModel().getParentName() % getModelName() %
+                           time % mRunningActivity->name());
 
                 ee << vle::devs::attribute("activity",
                                            mRunningActivity->toValue());
@@ -110,10 +106,9 @@ public:
             for(Activities::const_iterator it = mDoneActivities.begin();
                 it != mDoneActivities.end(); ++it) {
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] - " << (*it)->name()
-                          << " - done" << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% - done") %
+                           getModel().getParentName() % getModelName() %
+                           time % (*it)->name());
 
                 {
                     vle::devs::ExternalEvent* ee =
@@ -127,13 +122,9 @@ public:
             for(Activities::const_iterator it = mReleasedActivities.begin();
                 it != mReleasedActivities.end(); ++it) {
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] - " << (*it)->name()
-                          << " - release"
-                          << " => "
-                          << *(*it)->allocatedResources()
-                          << std::endl;
+                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% - release => %5%")
+                           % getModel().getParentName() % getModelName() %
+                           time % (*it)->name() % *(*it)->allocatedResources());
 
                 Resources* releasedResources = (*it)->releasedResources();
 
@@ -235,11 +226,10 @@ public:
                     Activity* a =
                         Activity::build((*it)->getAttributeValue("activity"));
 
-                    std::cout << "[" << getModel().getParentName()
-                              << ":" << getModelName()
-                              << "] at " << time
-                              << " - schedule = " << a->current()->name()
-                              << "/" << a->name() << std::endl;
+                    TraceModel(
+                        vle::fmt(" [%1%:%2%] at %3% -> schedule = %4%/%5%") %
+                        getModel().getParentName() % getModelName() %
+                        time % a->current()->name() % a->name());
 
                     mWaitingActivities.push_back(a);
                     mPhase = SEND_DEMAND;
@@ -251,18 +241,20 @@ public:
 
                 a->assign(r);
 
-                std::cout << "[" << getModel().getParentName()
-                          << ":" << getModelName()
-                          << "] - assign = " << r->size()
-                          << " -> " << a->name()
-                          << " -> ";
                 if (a->allocatedResources()) {
-                    std::cout << *a->allocatedResources();
+                    TraceModel(
+                        vle::fmt(
+                            " [%1%:%2%] at %3% -> assign = %4% -> %5% -> %6%")
+                        % getModel().getParentName() % getModelName() %
+                        time % r->size() % a->name() %
+                        *a->allocatedResources());
                 } else {
-                    std::cout << "{}";
-
+                    TraceModel(
+                        vle::fmt(
+                            " [%1%:%2%] at %3% -> assign = %4% -> %5% -> {}")
+                        % getModel().getParentName() % getModelName() %
+                        time % r->size() % a->name());
                 }
-                std::cout << std::endl;
 
                 if (a->checkResourceConstraint()) {
                     mRunningActivity = a;

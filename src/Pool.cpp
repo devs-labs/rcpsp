@@ -137,8 +137,7 @@ public:
                     mPhase = SEND_AVAILABLE;
                 }
             } else if ((*it)->onPort("release")) {
-                Resources* r = Resources::build(
-                    (*it)->getAttributeValue("resources"));
+                Resources* r = Resources::build(Resources::get(*it));
 
                 TraceModel(vle::fmt(
                                " [%1%:%2%] at %3% -> %4% release: %5%")

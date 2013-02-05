@@ -51,7 +51,7 @@ public:
     vle::devs::Time init(const vle::devs::Time& /* time */)
     {
         mRunningActivity = 0;
-        mPhase = WAIT;
+        mPhase = WAIT_SCHEDULE;
         return vle::devs::infinity;
     }
 
@@ -166,12 +166,12 @@ public:
                 mWaitingActivities.erase(it);
                 mPhase = SEND_PROCESS;
             } else {
-                mPhase = WAIT;
+                mPhase = WAIT_ASSIGN;
             }
         } else if (mPhase == SEND_DONE) {
             mDoneActivities.clear();
             if (mWaitingActivities.empty()) {
-                mPhase = WAIT;
+                mPhase = WAIT_SCHEDULE;
             } else {
                 mPhase = SEND_DEMAND;
             }
@@ -181,7 +181,7 @@ public:
                 mRunningActivity = 0;
             }
             if (mWaitingActivities.empty()) {
-                mPhase = WAIT;
+                mPhase = WAIT_SCHEDULE;
             } else {
                 mPhase = SEND_DEMAND;
             }
@@ -207,7 +207,7 @@ public:
         } else if (mPhase == SEND_SCHEDULE) {
             mSchedulingActivities.clear();
             if (mWaitingActivities.empty()) {
-                mPhase = WAIT;
+                mPhase = WAIT_SCHEDULE;
             } else {
                 mPhase = SEND_DEMAND;
             }
@@ -222,9 +222,8 @@ public:
 
         while (it != events.end()) {
             if ((*it)->onPort("schedule")) {
-                if ((*it)->getStringAttributeValue("location") == mLocation) {
-                    Activity* a =
-                        Activity::build((*it)->getAttributeValue("activity"));
+                if (Location::get(*it) == mLocation) {
+                    Activity* a = Activity::build(Activity::get(*it));
 
                     TraceModel(
                         vle::fmt(" [%1%:%2%] at %3% -> schedule = %4%/%5%") %
@@ -232,11 +231,13 @@ public:
                         time % a->current()->name() % a->name());
 
                     mWaitingActivities.push_back(a);
-                    mPhase = SEND_DEMAND;
+
+                    if (mPhase == WAIT_SCHEDULE) {
+                        mPhase = SEND_DEMAND;
+                    }
                 }
             } else if ((*it)->onPort("assign")) {
-                Resources* r = Resources::build(
-                    (*it)->getAttributeValue("resources"));
+                Resources* r = Resources::build(Resources::get(*it));
                 Activity* a = select();
 
                 a->assign(r);
@@ -267,8 +268,7 @@ public:
                     mPhase = SEND_PROCESS;
                 }
             } else if ((*it)->onPort("done")) {
-                Activity* a =
-                    Activity::build((*it)->getAttributeValue("activity"));
+                Activity* a = Activity::build(Activity::get(*it));
 
                 mReleasedActivities.push_back(a);
                 mPhase = SEND_RELEASE;
@@ -293,8 +293,8 @@ public:
     }
 
 private:
-    enum Phase { WAIT, SEND_DEMAND, SEND_DONE, SEND_PROCESS, SEND_RELEASE,
-                 SEND_SCHEDULE };
+    enum Phase { WAIT_SCHEDULE, WAIT_ASSIGN, SEND_DEMAND, SEND_DONE,
+                 SEND_PROCESS, SEND_RELEASE, SEND_SCHEDULE };
 
     std::string mLocation;
 

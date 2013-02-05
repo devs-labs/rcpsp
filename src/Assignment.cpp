@@ -44,7 +44,8 @@ public:
         mResourceConstraints = 0;
         mAvailableResourceNumber = 0;
         mReleasedResources = 0;
-        mPhase = WAIT;
+        mResponseNumber = 0;
+        mPhase = WAIT_DEMAND;
         return vle::devs::infinity;
     }
 
@@ -100,16 +101,19 @@ public:
     void internalTransition(const vle::devs::Time& /* time */)
     {
         if (mPhase == SEND_ASSIGN) {
-            mAvailableResourceNumber = 0;
-            delete mResourceConstraints;
-            mResourceConstraints = 0;
-            mPhase = WAIT;
+            clearDemand();
+            mPhase = WAIT_DEMAND;
         } else if (mPhase == SEND_DEMAND) {
-            mPhase = WAIT;
+            mPhase = WAIT_AVAILABLE;
         } else if (mPhase == SEND_RELEASE) {
             delete mReleasedResources;
             mReleasedResources = 0;
-            mPhase = WAIT;
+            if (mResourceConstraints != 0 and
+                mResponseNumber < mResourceConstraints->size()) {
+                mPhase = WAIT_AVAILABLE;
+            } else {
+                mPhase = WAIT_DEMAND;
+            }
         }
     }
 
@@ -127,6 +131,7 @@ public:
                 if (available) {
                     mAvailableResourceNumber += number;
                 }
+                ++mResponseNumber;
 
                 TraceModel(vle::fmt(" [%1%:%2%] at %3% -> available: %4% / %5%")
                            % getModel().getParentName() % getModelName() %
@@ -137,12 +142,16 @@ public:
                     mResourceConstraints->quantity()) {
                     mPhase = SEND_ASSIGN;
                 } else {
-                    mPhase = WAIT;
+                    if (mResponseNumber == mResourceConstraints->size()) {
+                        clearDemand();
+                        mPhase = WAIT_DEMAND;
+                    } else {
+                        mPhase = WAIT_AVAILABLE;
+                    }
                 }
             } else if ((*it)->onPort("demand")) {
                 mResourceConstraints =
-                    ResourceConstraints::build(
-                        (*it)->getAttributeValue("resources"));
+                    ResourceConstraints::build(Resources::get(*it));
 
                 TraceModel(vle::fmt(" [%1%:%2%] at %3% -> demand: %4%") %
                            getModel().getParentName() % getModelName() %
@@ -150,8 +159,7 @@ public:
 
                 mPhase = SEND_DEMAND;
             } else if ((*it)->onPort("release")) {
-                mReleasedResources = Resources::build(
-                    (*it)->getAttributeValue("resources"));
+                mReleasedResources = Resources::build(Resources::get(*it));
 
                 TraceModel(vle::fmt(" [%1%:%2%] at %3% -> release: %4%") %
                            getModel().getParentName() % getModelName() %
@@ -164,16 +172,26 @@ public:
     }
 
     virtual vle::value::Value* observation(
-        const vle::devs::ObservationEvent& event) const
+        const vle::devs::ObservationEvent& /* event */) const
     {
         return 0;
     }
 
 private:
-    enum Phase { WAIT, SEND_DEMAND, SEND_ASSIGN, SEND_RELEASE };
+    void clearDemand()
+    {
+        mAvailableResourceNumber = 0;
+        mResponseNumber = 0;
+        delete mResourceConstraints;
+        mResourceConstraints = 0;
+    }
+
+    enum Phase { WAIT_AVAILABLE, WAIT_DEMAND, SEND_DEMAND, SEND_ASSIGN,
+                 SEND_RELEASE };
 
     Phase mPhase;
     ResourceConstraints* mResourceConstraints;
+    unsigned int mResponseNumber;
     unsigned int mAvailableResourceNumber;
     Resources* mReleasedResources;
 };

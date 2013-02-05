@@ -111,8 +111,7 @@ public:
 
         while (it != events.end()) {
             if ((*it)->onPort("process")) {
-                Activity* a =
-                    Activity::build((*it)->getAttributeValue("activity"));
+                Activity* a = Activity::build(Activity::get(*it));
 
                 TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% starts") %
                            getModel().getParentName() % getModelName() %

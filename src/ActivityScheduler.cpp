@@ -96,8 +96,7 @@ public:
                     }
                 }
             } else if ((*it)->onPort("done")) {
-                Activity* a =
-                    Activity::build((*it)->getAttributeValue("activity"));
+                Activity* a = Activity::build(Activity::get(*it));
 
                 TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% DONE") %
                            getModel().getParentName() % getModelName() %

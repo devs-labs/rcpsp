@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 
+#include <vle/devs/ExternalEvent.hpp>
 #include <vle/value/Value.hpp>
 
 #include <Resource.hpp>
@@ -62,6 +63,9 @@ public:
 
     static Resources* build(const vle::value::Value& value)
     { return new Resources(&value); }
+
+    static const vle::value::Value& get(const vle::devs::ExternalEvent* ee)
+    { return ee->getAttributeValue("resources"); }
 
     vle::value::Value* toValue() const
     {

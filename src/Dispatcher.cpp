@@ -23,6 +23,8 @@
 
 #include <vle/devs/Dynamics.hpp>
 
+#include <Location.hpp>
+
 namespace rcpsp {
 
 class Dispatcher : public vle::devs::Dynamics
@@ -85,7 +87,7 @@ public:
         vle::devs::ExternalEventList::const_iterator it = events.begin();
 
         while (it != events.end()) {
-            std::string location = (*it)->getStringAttributeValue("location");
+            std::string location = Location::get(*it);
             vle::devs::ExternalEvent* ee = cloneExternalEvent(*it, location);
 
             mEvents.push_back(ee);

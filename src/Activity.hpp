@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 
+#include <vle/devs/ExternalEvent.hpp>
 #include <vle/value/Value.hpp>
 
 #include <Resources.hpp>
@@ -86,6 +87,9 @@ public:
     { return mStepIterator == mSteps->end(); }
 
     void finish(const vle::devs::Time& time);
+
+    static const vle::value::Value& get(const vle::devs::ExternalEvent* ee)
+    { return ee->getAttributeValue("activity"); }
 
     const Location& location() const
     { return (*mStepIterator)->location(); }

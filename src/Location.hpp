@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 
+#include <vle/devs/ExternalEvent.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Value.hpp>
 
@@ -40,6 +41,9 @@ public:
 
     Location(const vle::value::Value* value)
     { mName = vle::value::toString(value); }
+
+    static const std::string& get(const vle::devs::ExternalEvent* ee)
+    { return ee->getStringAttributeValue("location"); }
 
     const std::string& name() const
     { return mName; }

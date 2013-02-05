@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.1.0.dtd">
 <vle_project version="1.0.1" date="sam., 10 mars 2012" author="Eric Ramat">
 <structures>
 <model name="Top model" type="coupled" x="0" y="0" width="847" height="642"  >
@@ -55,7 +55,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="591"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="594"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -64,7 +64,7 @@
  <port name="assign" />
 </out>
 <submodels>
-<model name="assignment" type="atomic" dynamics="dyn_assignment" x="130" y="132" width="100" height="75" >
+<model name="assignment" type="atomic" dynamics="dyn_assignment" x="130" y="132" width="100" height="90" >
 <in>
  <port name="available" />
  <port name="demand" />
@@ -74,6 +74,7 @@
  <port name="assign" />
  <port name="demand" />
  <port name="release" />
+ <port name="unavailable" />
 </out>
 </model>
 <model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
@@ -217,7 +218,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="100" height="60"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="594"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -226,7 +227,7 @@
  <port name="assign" />
 </out>
 <submodels>
-<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="75" >
+<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="90" >
 <in>
  <port name="available" />
  <port name="demand" />
@@ -236,6 +237,7 @@
  <port name="assign" />
  <port name="demand" />
  <port name="release" />
+ <port name="unavailable" />
 </out>
 </model>
 <model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
@@ -379,7 +381,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="591"  >
+<model name="ressource_manager" type="coupled" x="306" y="41" width="847" height="594"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -388,7 +390,7 @@
  <port name="assign" />
 </out>
 <submodels>
-<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="75" >
+<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="90" >
 <in>
  <port name="available" />
  <port name="demand" />
@@ -398,6 +400,7 @@
  <port name="assign" />
  <port name="demand" />
  <port name="release" />
+ <port name="unavailable" />
 </out>
 </model>
 <model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
@@ -541,7 +544,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="325" y="18" width="100" height="60"  >
+<model name="ressource_manager" type="coupled" x="325" y="18" width="847" height="594"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -550,7 +553,7 @@
  <port name="assign" />
 </out>
 <submodels>
-<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="75" >
+<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="90" >
 <in>
  <port name="available" />
  <port name="demand" />
@@ -560,6 +563,7 @@
  <port name="assign" />
  <port name="demand" />
  <port name="release" />
+ <port name="unavailable" />
 </out>
 </model>
 <model name="pool_1" type="atomic" conditions="cond_pool_1" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
@@ -587,11 +591,11 @@
 </submodels>
 <connections>
 <connection type="output">
- <origin model="pool_1" port="assign" />
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="output">
- <origin model="pool_2" port="assign" />
+ <origin model="pool_1" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">
@@ -604,27 +608,27 @@
 </connection>
 <connection type="internal">
  <origin model="assignment" port="assign" />
- <destination model="pool_1" port="assign" />
-</connection>
-<connection type="internal">
- <origin model="assignment" port="assign" />
  <destination model="pool_2" port="assign" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="demand" />
- <destination model="pool_1" port="demand" />
+ <origin model="assignment" port="assign" />
+ <destination model="pool_1" port="assign" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="demand" />
  <destination model="pool_2" port="demand" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="release" />
- <destination model="pool_1" port="release" />
+ <origin model="assignment" port="demand" />
+ <destination model="pool_1" port="demand" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="release" />
  <destination model="pool_2" port="release" />
+</connection>
+<connection type="internal">
+ <origin model="assignment" port="release" />
+ <destination model="pool_1" port="release" />
 </connection>
 <connection type="internal">
  <origin model="pool_1" port="available" />
@@ -680,7 +684,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_1" port="schedule" />
- <destination model="location_2" port="schedule" />
+ <destination model="location_4" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_1" port="schedule" />
@@ -688,7 +692,7 @@
 </connection>
 <connection type="internal">
  <origin model="location_1" port="schedule" />
- <destination model="location_4" port="schedule" />
+ <destination model="location_2" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_2" port="done" />
@@ -696,15 +700,15 @@
 </connection>
 <connection type="internal">
  <origin model="location_2" port="schedule" />
+ <destination model="location_4" port="schedule" />
+</connection>
+<connection type="internal">
+ <origin model="location_2" port="schedule" />
  <destination model="location_3" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_2" port="schedule" />
  <destination model="location_1" port="schedule" />
-</connection>
-<connection type="internal">
- <origin model="location_2" port="schedule" />
- <destination model="location_4" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_3" port="done" />
@@ -712,6 +716,10 @@
 </connection>
 <connection type="internal">
  <origin model="location_3" port="schedule" />
+ <destination model="location_4" port="schedule" />
+</connection>
+<connection type="internal">
+ <origin model="location_3" port="schedule" />
  <destination model="location_2" port="schedule" />
 </connection>
 <connection type="internal">
@@ -719,20 +727,16 @@
  <destination model="location_1" port="schedule" />
 </connection>
 <connection type="internal">
- <origin model="location_3" port="schedule" />
- <destination model="location_4" port="schedule" />
-</connection>
-<connection type="internal">
  <origin model="location_4" port="done" />
  <destination model="scheduler" port="done" />
 </connection>
 <connection type="internal">
  <origin model="location_4" port="schedule" />
- <destination model="location_2" port="schedule" />
+ <destination model="location_3" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_4" port="schedule" />
- <destination model="location_3" port="schedule" />
+ <destination model="location_2" port="schedule" />
 </connection>
 <connection type="internal">
  <origin model="location_4" port="schedule" />
@@ -762,13 +766,13 @@
 </model>
 </structures>
 <dynamics>
-<dynamic name="dyn_activity_scheduler" library="ActivityScheduler" package="rcpsp" type="local"  />
-<dynamic name="dyn_assignment" library="Assignment" package="rcpsp" type="local"  />
-<dynamic name="dyn_constructor" library="Constructor" package="rcpsp" type="local"  />
-<dynamic name="dyn_pool" library="Pool" package="rcpsp" type="local"  />
-<dynamic name="dyn_processor" library="Processor" package="rcpsp" type="local"  />
-<dynamic name="dyn_start" library="Beep" package="rcpsp" type="local"  />
-<dynamic name="dyn_step_scheduler" library="StepScheduler" package="rcpsp" type="local"  />
+<dynamic name="dyn_activity_scheduler" library="ActivityScheduler" package="rcpsp"  />
+<dynamic name="dyn_assignment" library="Assignment" package="rcpsp"  />
+<dynamic name="dyn_constructor" library="Constructor" package="rcpsp"  />
+<dynamic name="dyn_pool" library="Pool" package="rcpsp"  />
+<dynamic name="dyn_processor" library="Processor" package="rcpsp"  />
+<dynamic name="dyn_start" library="Beep" package="rcpsp"  />
+<dynamic name="dyn_step_scheduler" library="StepScheduler" package="rcpsp"  />
 </dynamics>
 <classes>
 <class name="Location" >
@@ -851,11 +855,11 @@
 </submodels>
 <connections>
 <connection type="output">
- <origin model="pool_2" port="assign" />
+ <origin model="pool_1" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="output">
- <origin model="pool_1" port="assign" />
+ <origin model="pool_2" port="assign" />
  <destination model="ressource_manager" port="assign" />
 </connection>
 <connection type="input">
@@ -868,27 +872,27 @@
 </connection>
 <connection type="internal">
  <origin model="assignment" port="assign" />
- <destination model="pool_2" port="assign" />
-</connection>
-<connection type="internal">
- <origin model="assignment" port="assign" />
  <destination model="pool_1" port="assign" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="demand" />
- <destination model="pool_2" port="demand" />
+ <origin model="assignment" port="assign" />
+ <destination model="pool_2" port="assign" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="demand" />
  <destination model="pool_1" port="demand" />
 </connection>
 <connection type="internal">
- <origin model="assignment" port="release" />
- <destination model="pool_2" port="release" />
+ <origin model="assignment" port="demand" />
+ <destination model="pool_2" port="demand" />
 </connection>
 <connection type="internal">
  <origin model="assignment" port="release" />
  <destination model="pool_1" port="release" />
+</connection>
+<connection type="internal">
+ <origin model="assignment" port="release" />
+ <destination model="pool_2" port="release" />
 </connection>
 <connection type="internal">
  <origin model="pool_1" port="available" />
@@ -951,7 +955,7 @@
 </model>
 </class>
 </classes>
-<experiment name="exp" duration="50.000000000000000" begin="0.000000000000000" combination="linear" seed="545404204" >
+<experiment name="exp" duration="50.000000000000000" begin="0.000000000000000" combination="linear"  >
 <conditions>
 <condition name="cond_activity_scheduler" >
  <port name="activities" >

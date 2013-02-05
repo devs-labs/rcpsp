@@ -2,7 +2,7 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.1.0.dtd">
 <vle_project version="1.0.1" date="sam., 10 mars 2012" author="Eric Ramat">
 <structures>
-<model name="Top model" type="coupled" x="0" y="0" width="847" height="596"  >
+<model name="Top model" type="coupled" x="0" y="0" width="847" height="594"  >
 <submodels>
 <model name="constructor" type="atomic" conditions="cond_constructor" dynamics="dyn_constructor" x="264" y="135" width="100" height="45" >
 <out>
@@ -35,7 +35,7 @@
 </dynamics>
 <classes>
 <class name="Location" >
-<model name="location" type="coupled" x="251" y="20" width="847" height="594"  >
+<model name="location" type="coupled" x="251" y="20" width="1226" height="652"  >
 <in>
  <port name="schedule" />
 </in>
@@ -75,7 +75,7 @@
  <port name="assign" />
 </out>
 <submodels>
-<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="75" >
+<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="90" >
 <in>
  <port name="available" />
  <port name="demand" />
@@ -85,6 +85,7 @@
  <port name="assign" />
  <port name="demand" />
  <port name="release" />
+ <port name="unavailable" />
 </out>
 </model>
 <model name="constructor" type="atomic" conditions="cond_pool_constructor" dynamics="dyn_pool_constructor" x="285" y="264" width="100" height="30" >

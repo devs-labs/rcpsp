@@ -85,13 +85,15 @@ public:
             ee << vle::devs::attribute("resources",
                                        mReleasedResources->toValue());
             output.addEvent(ee);
+        } else if (mPhase == SEND_UNAVAILABLE) {
+            output.addEvent(buildEvent("unavailable"));
         }
     }
 
     vle::devs::Time timeAdvance() const
     {
         if (mPhase == SEND_ASSIGN or mPhase == SEND_DEMAND or
-            mPhase == SEND_RELEASE) {
+            mPhase == SEND_RELEASE or mPhase == SEND_UNAVAILABLE) {
             return 0;
         } else {
             return vle::devs::infinity;
@@ -114,6 +116,8 @@ public:
             } else {
                 mPhase = WAIT_DEMAND;
             }
+        } else if (mPhase == SEND_UNAVAILABLE) {
+            mPhase = WAIT_DEMAND;
         }
     }
 
@@ -144,7 +148,7 @@ public:
                 } else {
                     if (mResponseNumber == mResourceConstraints->size()) {
                         clearDemand();
-                        mPhase = WAIT_DEMAND;
+                        mPhase = SEND_UNAVAILABLE;
                     } else {
                         mPhase = WAIT_AVAILABLE;
                     }
@@ -187,7 +191,7 @@ private:
     }
 
     enum Phase { WAIT_AVAILABLE, WAIT_DEMAND, SEND_DEMAND, SEND_ASSIGN,
-                 SEND_RELEASE };
+                 SEND_RELEASE, SEND_UNAVAILABLE };
 
     Phase mPhase;
     ResourceConstraints* mResourceConstraints;

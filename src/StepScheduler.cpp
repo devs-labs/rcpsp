@@ -22,15 +22,9 @@
  */
 
 #include <devs/StepScheduler.hpp>
+#include <policy/FIFOPolicy.hpp>
 
 namespace rcpsp {
-
-class ActivityFIFO : public std::list < Activity* >
-{
-public:
-    ActivityFIFO()
-    { }
-};
 
 class StepScheduler : public devs::StepScheduler
 {
@@ -38,41 +32,39 @@ public:
     StepScheduler(const vle::devs::DynamicsInit& init,
                   const vle::devs::InitEventList& events) :
         devs::StepScheduler(init, events)
-    { }
+    {
+        mPolicy = new FIFOPolicy(mWaitingActivities);
+    }
 
     virtual void add(Activity* a)
-    {
-        mWaitingActivities.push_back(a);
-    }
+    { mPolicy->add(a); }
+
+    virtual bool another() const
+    { return mPolicy->another(); }
 
     virtual bool empty() const
     { return mWaitingActivities.empty(); }
 
+    virtual void next()
+    { mPolicy->next(); }
+
     virtual void remove(Activity* a)
     {
-        ActivityFIFO::iterator it = std::find(
-            mWaitingActivities.begin(),
-            mWaitingActivities.end(), a);
+        WaitingActivities::iterator it = std::find(mWaitingActivities.begin(),
+                                                   mWaitingActivities.end(), a);
 
         mWaitingActivities.erase(it);
     }
 
     virtual Activity* select() const
-    { return empty() ? 0 : mWaitingActivities.front(); }
+    { return mPolicy->select(); }
 
     virtual vle::value::Value* observe() const
-    {
-        vle::value::Set* list = new vle::value::Set;
-
-        for(ActivityFIFO::const_iterator it =  mWaitingActivities.begin();
-            it != mWaitingActivities.end(); ++it) {
-            list->add(new vle::value::String((*it)->name()));
-        }
-        return list;
-    }
+    { return mWaitingActivities.toValue(); }
 
 private:
-    ActivityFIFO mWaitingActivities;
+    WaitingActivities mWaitingActivities;
+    StepSchedulingPolicy* mPolicy;
 };
 
 } // namespace rcpsp

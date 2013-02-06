@@ -23,14 +23,15 @@
 
 #include <devs/StepScheduler.hpp>
 
+#include <vle/utils/Trace.hpp>
+
 namespace rcpsp { namespace devs {
 
 StepScheduler::StepScheduler(const vle::devs::DynamicsInit& init,
                              const vle::devs::InitEventList& events) :
-    vle::devs::Dynamics(init, events)
-{
-    mLocation = vle::value::toString(events.get("location"));
-}
+    vle::devs::Dynamics(init, events),
+    mLocation(vle::value::toString(events.get("location")))
+{ }
 
 vle::devs::Time StepScheduler::init(const vle::devs::Time& /* time */)
 {
@@ -76,15 +77,13 @@ void StepScheduler::output(const vle::devs::Time& time,
     } else if (mPhase == SEND_SCHEDULE) {
         for(Activities::const_iterator it = mSchedulingActivities.begin();
             it != mSchedulingActivities.end(); ++it) {
-            {
-                vle::devs::ExternalEvent* ee =
-                    new vle::devs::ExternalEvent("schedule");
+            vle::devs::ExternalEvent* ee =
+                new vle::devs::ExternalEvent("schedule");
 
-                ee << vle::devs::attribute("location",
-                                           (*it)->location().name());
-                ee << vle::devs::attribute("activity", (*it)->toValue());
-                output.addEvent(ee);
-            }
+            ee << vle::devs::attribute("location",
+                                       (*it)->location().name());
+            ee << vle::devs::attribute("activity", (*it)->toValue());
+            output.addEvent(ee);
         }
     } else if (mPhase == SEND_DONE) {
         for(Activities::const_iterator it = mDoneActivities.begin();
@@ -94,13 +93,11 @@ void StepScheduler::output(const vle::devs::Time& time,
                        getModel().getParentName() % getModelName() %
                        time % (*it)->name());
 
-            {
-                vle::devs::ExternalEvent* ee =
-                    new vle::devs::ExternalEvent("done");
+            vle::devs::ExternalEvent* ee =
+                new vle::devs::ExternalEvent("done");
 
-                ee << vle::devs::attribute("activity", (*it)->toValue());
-                output.addEvent(ee);
-            }
+            ee << vle::devs::attribute("activity", (*it)->toValue());
+            output.addEvent(ee);
         }
     } else if (mPhase == SEND_RELEASE) {
         for(Activities::const_iterator it = mReleasedActivities.begin();
@@ -246,7 +243,12 @@ void StepScheduler::externalTransition(
             mReleasedActivities.push_back(a);
             mPhase = SEND_RELEASE;
         }  else if ((*it)->onPort("unavailable")) {
-            mPhase = WAIT_RESOURCE;
+            if (another()) {
+                next();
+                mPhase = SEND_DEMAND;
+            } else {
+                mPhase = WAIT_RESOURCE;
+            }
         }
         ++it;
     }
@@ -261,5 +263,4 @@ vle::value::Value* StepScheduler::observation(
     return 0;
 }
 
-} // namespace devs
-} // namespace rcpsp
+} } // namespace devs rcpsp

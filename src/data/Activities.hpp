@@ -24,6 +24,7 @@
 #ifndef __ACTIVITIES_HPP
 #define __ACTIVITIES_HPP 1
 
+#include <deque>
 #include <ostream>
 #include <list>
 #include <vector>
@@ -86,6 +87,23 @@ private:
     friend std::ostream& operator<<(std::ostream& o, const Activities& a);
 
     result_t mStartingActivities;
+};
+
+class WaitingActivities : public std::deque < Activity* >
+{
+public:
+    WaitingActivities()
+    { }
+
+    vle::value::Value* toValue() const
+    {
+        vle::value::Set* list = new vle::value::Set;
+
+        for(const_iterator it =  begin(); it != end(); ++it) {
+            list->add(new vle::value::String((*it)->name()));
+        }
+        return list;
+    }
 };
 
 } // namespace rcpsp

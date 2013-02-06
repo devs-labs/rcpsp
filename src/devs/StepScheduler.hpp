@@ -23,8 +23,6 @@
 
 #include <vle/devs/Dynamics.hpp>
 
-#include <vle/utils/Trace.hpp>
-
 #include <data/Activities.hpp>
 
 namespace rcpsp { namespace devs {
@@ -36,7 +34,9 @@ public:
                   const vle::devs::InitEventList& events);
 
     virtual void add(Activity* a) =0;
+    virtual bool another() const =0;
     virtual bool empty() const =0;
+    virtual void next() =0;
     virtual void remove(Activity* a) =0;
     virtual Activity* select() const =0;
     virtual vle::value::Value* observe() const =0;
@@ -65,5 +65,4 @@ private:
     Activities mSchedulingActivities;
 };
 
-} // namespace devs
-} // namespace rcpsp
+} } // namespace devs rcpsp

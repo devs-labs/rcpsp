@@ -25,6 +25,13 @@
 
 namespace rcpsp {
 
+class ActivityFIFO : public std::list < Activity* >
+{
+public:
+    ActivityFIFO()
+    { }
+};
+
 class StepScheduler : public devs::StepScheduler
 {
 public:
@@ -51,13 +58,7 @@ public:
     }
 
     virtual Activity* select() const
-    {
-        if (mWaitingActivities.empty()) {
-            return 0;
-        } else {
-            return mWaitingActivities.front();
-        }
-    }
+    { return empty() ? 0 : mWaitingActivities.front(); }
 
     virtual vle::value::Value* observe() const
     {

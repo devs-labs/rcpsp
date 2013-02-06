@@ -88,13 +88,6 @@ private:
     result_t mStartingActivities;
 };
 
-class ActivityFIFO : public std::list < Activity* >
-{
-public:
-    ActivityFIFO()
-    { }
-};
-
 } // namespace rcpsp
 
 #endif

@@ -35,7 +35,7 @@
 </dynamics>
 <classes>
 <class name="Location" >
-<model name="location" type="coupled" x="251" y="20" width="1226" height="652"  >
+<model name="location" type="coupled" x="251" y="20" width="1250" height="652"  >
 <in>
  <port name="schedule" />
 </in>
@@ -44,7 +44,7 @@
  <port name="schedule" />
 </out>
 <submodels>
-<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="393" y="274" width="100" height="45" >
+<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="401" y="316" width="100" height="45" >
 <in>
  <port name="process" />
 </in>
@@ -52,11 +52,12 @@
  <port name="done" />
 </out>
 </model>
-<model name="scheduler" type="atomic" conditions="cond_step_scheduler" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="114" y="124" width="100" height="105" >
+<model name="scheduler" type="atomic" conditions="cond_step_scheduler" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="140" y="139" width="100" height="105" >
 <in>
  <port name="assign" />
  <port name="done" />
  <port name="schedule" />
+ <port name="unavailable" />
 </in>
 <out>
  <port name="demand" />
@@ -66,13 +67,14 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="325" y="18" width="847" height="594"  >
+<model name="ressource_manager" type="coupled" x="374" y="24" width="100" height="60"  >
 <in>
  <port name="demand" />
  <port name="release" />
 </in>
 <out>
  <port name="assign" />
+ <port name="unavailable" />
 </out>
 <submodels>
 <model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="90" >
@@ -92,6 +94,10 @@
 </model>
 </submodels>
 <connections>
+<connection type="output">
+ <origin model="assignment" port="unavailable" />
+ <destination model="ressource_manager" port="unavailable" />
+</connection>
 <connection type="input">
  <origin model="ressource_manager" port="demand" />
  <destination model="assignment" port="demand" />
@@ -123,6 +129,10 @@
 <connection type="internal">
  <origin model="ressource_manager" port="assign" />
  <destination model="scheduler" port="assign" />
+</connection>
+<connection type="internal">
+ <origin model="ressource_manager" port="unavailable" />
+ <destination model="scheduler" port="unavailable" />
 </connection>
 <connection type="internal">
  <origin model="scheduler" port="demand" />

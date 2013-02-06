@@ -151,7 +151,7 @@ public:
         }
     }
 
-    void internalTransition(const vle::devs::Time& time)
+    void internalTransition(const vle::devs::Time& /* time */)
     {
         if (mPhase == SEND_DEMAND) {
             Activity* a = select();
@@ -272,6 +272,8 @@ public:
 
                 mReleasedActivities.push_back(a);
                 mPhase = SEND_RELEASE;
+            }  else if ((*it)->onPort("unavailable")) {
+                mPhase = WAIT_RESOURCE;
             }
             ++it;
         }
@@ -293,8 +295,8 @@ public:
     }
 
 private:
-    enum Phase { WAIT_SCHEDULE, WAIT_ASSIGN, SEND_DEMAND, SEND_DONE,
-                 SEND_PROCESS, SEND_RELEASE, SEND_SCHEDULE };
+    enum Phase { WAIT_SCHEDULE, WAIT_ASSIGN, WAIT_RESOURCE, SEND_DEMAND,
+                 SEND_DONE, SEND_PROCESS, SEND_RELEASE, SEND_SCHEDULE };
 
     std::string mLocation;
 

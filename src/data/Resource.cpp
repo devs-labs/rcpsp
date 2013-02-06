@@ -1,5 +1,5 @@
 /**
- * @file Steps.cpp
+ * @file Resource.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,32 +21,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Steps.hpp>
+#include <data/Resource.hpp>
 
 namespace rcpsp {
 
-Steps::iterator Steps::find(const std::string& name)
+std::ostream& operator<<(std::ostream& o, const Resource& r)
 {
-    Steps::iterator it = begin();
-    bool found = false;
-
-    while (not found and it != end()) {
-        if ((*it)->name() == name) {
-            found = true;
-        } else {
-            ++it;
-        }
-    }
-    return it;
-}
-
-std::ostream& operator<<(std::ostream& o, const Steps& s)
-{
-    o << "{ ";
-    for (Steps::const_iterator it = s.begin(); it != s.end(); ++it) {
-        o << **it << " ";
-    }
-    o << "}";
+    o << "[ " << r.mName << " , " << r.mType << " ]";
     return o;
 }
 

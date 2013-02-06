@@ -25,7 +25,7 @@
 
 #include <vle/utils/Trace.hpp>
 
-#include <ResourcePool.hpp>
+#include <data/ResourcePool.hpp>
 
 namespace rcpsp {
 

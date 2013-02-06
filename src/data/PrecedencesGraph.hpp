@@ -1,5 +1,5 @@
 /**
- * @file Resources.cpp
+ * @file PrecedencesGraph.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,18 +21,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Resources.hpp>
+#ifndef __PRECEDENCE_GRAPH_HPP
+#define __PRECEDENCE_GRAPH_HPP 1
+
+#include <data/PrecedenceConstraint.hpp>
 
 namespace rcpsp {
 
-std::ostream& operator<<(std::ostream& o, const Resources& r)
+class PrecedencesGraph
 {
-    o << "{ ";
-    for (Resources::const_iterator it = r.begin(); it != r.end(); ++it) {
-        o << **it << " ";
+public:
+    PrecedencesGraph()
+    { }
+
+    void add(Activities::const_iterator& first,
+             Activities::const_iterator& second,
+             PrecedenceConstraint::Type type,
+             const vle::devs::Time& mintimelag,
+             const vle::devs::Time& maxtimelag)
+    {
+        mPrecedenceContraints.push_back(
+            PrecedenceConstraint(first, second, type, mintimelag, maxtimelag));
     }
-    o << "}";
-    return o;
-}
+
+private:
+    PrecedenceConstraints mPrecedenceContraints;
+};
 
 } // namespace rcpsp
+
+#endif

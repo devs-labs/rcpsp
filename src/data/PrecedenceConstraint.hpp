@@ -28,7 +28,7 @@
 
 #include <vle/devs/Time.hpp>
 
-#include <Activities.hpp>
+#include <data/Activities.hpp>
 
 namespace rcpsp {
 

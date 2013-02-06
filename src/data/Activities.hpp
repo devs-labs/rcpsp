@@ -1,5 +1,5 @@
 /**
- * @file ResourceConstraints.hpp
+ * @file Activities.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,64 +21,78 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RESOURCE_CONTRAINTS_HPP
-#define __RESOURCE_CONTRAINTS_HPP 1
+#ifndef __ACTIVITIES_HPP
+#define __ACTIVITIES_HPP 1
 
-#include <string>
-#include <vle/devs/Time.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/Value.hpp>
+#include <ostream>
+#include <list>
+#include <vector>
 
-#include <ResourceConstraint.hpp>
-#include <Resources.hpp>
+#include <data/Activity.hpp>
 
 namespace rcpsp {
 
-class ResourceConstraints : public std::vector < ResourceConstraint >
+class Activities : public std::vector < Activity* >
 {
 public:
-    ResourceConstraints()
+    typedef std::vector < Activity* > result_t;
+
+    Activities()
     { }
 
-    ResourceConstraints(const vle::value::Value* value)
+    Activities(const Activities& a) : std::vector < Activity* >(a)
+    {
+        for(const_iterator it = a.begin(); it != a.end(); ++it)
+            push_back(new Activity(**it));
+    }
+
+    Activities(const vle::value::Value* value)
     {
         const vle::value::Set* set =
             dynamic_cast < const vle::value::Set* >(value);
 
         for (unsigned int i = 0; i < set->size(); ++i) {
-            push_back(ResourceConstraint(set->get(i)));
+            push_back(new Activity(set->get(i)));
         }
     }
 
-    static ResourceConstraints* build(const vle::value::Value& value)
-    { return new ResourceConstraints(&value); }
+    virtual ~Activities()
+    { for(iterator it = begin(); it != end(); ++it) delete *it; }
 
-    ResourceConstraints buildResourceConstraints(const Resources* r) const;
-
-    bool checkResourceConstraint(const Resources& r) const;
-
-    unsigned int quantity() const
+    void clear()
     {
-        unsigned int n = 0;
-
-        for (const_iterator it = begin(); it != end(); ++it) {
-            n += it->quantity();
-        }
-        return n;
+        for(iterator it = begin(); it != end(); ++it) delete *it;
+        std::vector < Activity* >::clear();
     }
 
-    bool needAgain(const std::string& type) const;
+    void removeStartingActivities();
+
+    void starting(const vle::devs::Time& time);
+
+    const result_t& startingActivities() const
+    { return mStartingActivities; }
 
     vle::value::Value* toValue() const
     {
         vle::value::Set* value = new vle::value::Set;
 
         for (const_iterator it = begin(); it != end(); ++it) {
-            value->add(it->toValue());
+            value->add((*it)->toValue());
         }
         return value;
     }
 
+private:
+    friend std::ostream& operator<<(std::ostream& o, const Activities& a);
+
+    result_t mStartingActivities;
+};
+
+class ActivityFIFO : public std::list < Activity* >
+{
+public:
+    ActivityFIFO()
+    { }
 };
 
 } // namespace rcpsp

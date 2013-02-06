@@ -23,7 +23,7 @@
 
 #include <vle/devs/Executive.hpp>
 
-#include <Problem.hpp>
+#include <data/Problem.hpp>
 
 #include <fstream>
 

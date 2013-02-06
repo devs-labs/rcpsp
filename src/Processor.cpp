@@ -25,7 +25,7 @@
 
 #include <vle/utils/Trace.hpp>
 
-#include <Activities.hpp>
+#include <data/Activities.hpp>
 
 namespace rcpsp {
 

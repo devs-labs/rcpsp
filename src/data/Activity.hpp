@@ -30,9 +30,9 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/value/Value.hpp>
 
-#include <Resources.hpp>
-#include <Steps.hpp>
-#include <TemporalConstraints.hpp>
+#include <data/Resources.hpp>
+#include <data/Steps.hpp>
+#include <data/TemporalConstraints.hpp>
 
 namespace rcpsp {
 

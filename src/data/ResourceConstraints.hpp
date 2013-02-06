@@ -1,5 +1,5 @@
 /**
- * @file Steps.hpp
+ * @file ResourceConstraints.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,52 +21,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __STEPS_HPP
-#define __STEPS_HPP 1
+#ifndef __RESOURCE_CONTRAINTS_HPP
+#define __RESOURCE_CONTRAINTS_HPP 1
 
-#include <Step.hpp>
+#include <string>
+#include <vle/devs/Time.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Value.hpp>
+
+#include <data/ResourceConstraint.hpp>
+#include <data/Resources.hpp>
 
 namespace rcpsp {
 
-class Steps : public std::vector < Step* >
+class ResourceConstraints : public std::vector < ResourceConstraint >
 {
 public:
-    Steps()
+    ResourceConstraints()
     { }
 
-    Steps(const Steps& s) : std::vector < Step* >(s)
-    {
-        for(const_iterator it = s.begin(); it != s.end(); ++it)
-            push_back(new Step(**it));
-    }
-
-    Steps(const vle::value::Value* value)
+    ResourceConstraints(const vle::value::Value* value)
     {
         const vle::value::Set* set =
             dynamic_cast < const vle::value::Set* >(value);
 
         for (unsigned int i = 0; i < set->size(); ++i) {
-            push_back(new Step(set->get(i)));
+            push_back(ResourceConstraint(set->get(i)));
         }
     }
 
-    virtual ~Steps()
-    { for(iterator it = begin(); it != end(); ++it) delete *it; }
+    static ResourceConstraints* build(const vle::value::Value& value)
+    { return new ResourceConstraints(&value); }
 
-    Steps::iterator find(const std::string& name);
+    ResourceConstraints buildResourceConstraints(const Resources* r) const;
+
+    bool checkResourceConstraint(const Resources& r) const;
+
+    unsigned int quantity() const
+    {
+        unsigned int n = 0;
+
+        for (const_iterator it = begin(); it != end(); ++it) {
+            n += it->quantity();
+        }
+        return n;
+    }
+
+    bool needAgain(const std::string& type) const;
 
     vle::value::Value* toValue() const
     {
         vle::value::Set* value = new vle::value::Set;
 
         for (const_iterator it = begin(); it != end(); ++it) {
-            value->add((*it)->toValue());
+            value->add(it->toValue());
         }
         return value;
     }
-};
 
-std::ostream& operator<<(std::ostream& o, const Steps& s);
+};
 
 } // namespace rcpsp
 

@@ -28,7 +28,7 @@
 #include <vle/devs/Time.hpp>
 #include <vle/value/Value.hpp>
 
-#include <Resource.hpp>
+#include <data/Resource.hpp>
 
 namespace rcpsp {
 

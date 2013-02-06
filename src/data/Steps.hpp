@@ -1,5 +1,5 @@
 /**
- * @file Resource.hpp
+ * @file Steps.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,58 +21,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RESOURCE_HPP
-#define __RESOURCE_HPP 1
+#ifndef __STEPS_HPP
+#define __STEPS_HPP 1
 
-#include <string>
-#include <vector>
-
-#include <vle/value/Set.hpp>
-#include <vle/value/Value.hpp>
-
-#include <Planning.hpp>
+#include <data/Step.hpp>
 
 namespace rcpsp {
 
-class Resource
+class Steps : public std::vector < Step* >
 {
 public:
-    Resource(const std::string& name, const std::string& type) :
-        mName(name), mType(type)
+    Steps()
     { }
 
-    Resource(const vle::value::Value* value)
+    Steps(const Steps& s) : std::vector < Step* >(s)
+    {
+        for(const_iterator it = s.begin(); it != s.end(); ++it)
+            push_back(new Step(**it));
+    }
+
+    Steps(const vle::value::Value* value)
     {
         const vle::value::Set* set =
             dynamic_cast < const vle::value::Set* >(value);
 
-        mName = vle::value::toString(set->get(0));
-        mType = vle::value::toString(set->get(1));
+        for (unsigned int i = 0; i < set->size(); ++i) {
+            push_back(new Step(set->get(i)));
+        }
     }
 
-    const std::string& name() const
-    { return mName; }
+    virtual ~Steps()
+    { for(iterator it = begin(); it != end(); ++it) delete *it; }
+
+    Steps::iterator find(const std::string& name);
 
     vle::value::Value* toValue() const
     {
         vle::value::Set* value = new vle::value::Set;
 
-        value->add(new vle::value::String(mName));
-        value->add(new vle::value::String(mType));
+        for (const_iterator it = begin(); it != end(); ++it) {
+            value->add((*it)->toValue());
+        }
         return value;
     }
-
-    const std::string& type() const
-    { return mType; }
-
-private:
-    friend std::ostream& operator<<(std::ostream& o, const Resource& r);
-
-    std::string mName;
-    std::string mType;
 };
 
-std::ostream& operator<<(std::ostream& o, const Resource& r);
+std::ostream& operator<<(std::ostream& o, const Steps& s);
 
 } // namespace rcpsp
 

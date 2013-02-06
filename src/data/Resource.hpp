@@ -1,5 +1,5 @@
 /**
- * @file ResourcePool.hpp
+ * @file Resource.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RESOURCE_POOL_HPP
-#define __RESOURCE_POOL_HPP 1
+#ifndef __RESOURCE_HPP
+#define __RESOURCE_HPP 1
 
 #include <string>
 #include <vector>
@@ -30,63 +30,28 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/Value.hpp>
 
-#include <Resources.hpp>
+#include <data/Planning.hpp>
 
 namespace rcpsp {
 
-class ResourcePool
+class Resource
 {
 public:
-    ResourcePool(const std::string& name) :
-        mName(name)
+    Resource(const std::string& name, const std::string& type) :
+        mName(name), mType(type)
     { }
 
-    ResourcePool(const vle::value::Value* value)
+    Resource(const vle::value::Value* value)
     {
         const vle::value::Set* set =
             dynamic_cast < const vle::value::Set* >(value);
 
         mName = vle::value::toString(set->get(0));
         mType = vle::value::toString(set->get(1));
-        mResources = new Resources(set->get(2));
-        //TODO: mPlannings
     }
-
-    virtual ~ResourcePool()
-    { delete mResources; }
-
-    void add(Resource* resource)
-    { mResources->push_back(resource); }
-
-    Resources* assign(int n)
-    {
-        Resources* r = new Resources;
-
-        for(int i = 0; i < n; ++i) {
-            r->push_back(mResources->back());
-            mResources->pop_back();
-        }
-        return r;
-    }
-
-    //TODO: to include planning constraint
-    Resources* available() const
-    { return mResources; }
 
     const std::string& name() const
     { return mName; }
-
-    int quantity() const
-    { return mResources->size(); }
-
-    void release(Resources* r)
-    {
-        for(Resources::const_iterator it = r->begin(); it != r->end(); ++it) {
-            if (mType == (*it)->type()) {
-                mResources->push_back(*it);
-            }
-        }
-    }
 
     vle::value::Value* toValue() const
     {
@@ -94,8 +59,6 @@ public:
 
         value->add(new vle::value::String(mName));
         value->add(new vle::value::String(mType));
-        value->add(mResources->toValue());
-        //TODO: mPlannings
         return value;
     }
 
@@ -103,11 +66,13 @@ public:
     { return mType; }
 
 private:
+    friend std::ostream& operator<<(std::ostream& o, const Resource& r);
+
     std::string mName;
     std::string mType;
-    Resources* mResources;
-    Plannings mPlannings;
 };
+
+std::ostream& operator<<(std::ostream& o, const Resource& r);
 
 } // namespace rcpsp
 

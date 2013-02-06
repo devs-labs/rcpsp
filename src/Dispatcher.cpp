@@ -23,7 +23,7 @@
 
 #include <vle/devs/Dynamics.hpp>
 
-#include <Location.hpp>
+#include <data/Location.hpp>
 
 namespace rcpsp {
 

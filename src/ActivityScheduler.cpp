@@ -25,8 +25,8 @@
 
 #include <vle/utils/Trace.hpp>
 
-#include <Activity.hpp>
-#include <PrecedencesGraph.hpp>
+#include <data/Activity.hpp>
+#include <data/PrecedencesGraph.hpp>
 
 namespace rcpsp {
 

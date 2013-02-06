@@ -25,8 +25,8 @@
 
 #include <vle/utils/Trace.hpp>
 
-#include <Resources.hpp>
-#include <ResourceConstraints.hpp>
+#include <data/Resources.hpp>
+#include <data/ResourceConstraints.hpp>
 
 namespace rcpsp {
 

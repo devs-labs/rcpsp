@@ -1,5 +1,5 @@
 /**
- * @file Activities.hpp
+ * @file Resources.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,56 +21,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ACTIVITIES_HPP
-#define __ACTIVITIES_HPP 1
+#ifndef __RESOURCES_HPP
+#define __RESOURCES_HPP 1
 
-#include <ostream>
-#include <list>
+#include <string>
 #include <vector>
 
-#include <Activity.hpp>
+#include <vle/devs/ExternalEvent.hpp>
+#include <vle/value/Value.hpp>
+
+#include <data/Resource.hpp>
 
 namespace rcpsp {
 
-class Activities : public std::vector < Activity* >
+class Resources : public std::vector < Resource* >
 {
 public:
-    typedef std::vector < Activity* > result_t;
-
-    Activities()
+    Resources()
     { }
 
-    Activities(const Activities& a) : std::vector < Activity* >(a)
-    {
-        for(const_iterator it = a.begin(); it != a.end(); ++it)
-            push_back(new Activity(**it));
-    }
-
-    Activities(const vle::value::Value* value)
+    Resources(const vle::value::Value* value)
     {
         const vle::value::Set* set =
             dynamic_cast < const vle::value::Set* >(value);
 
         for (unsigned int i = 0; i < set->size(); ++i) {
-            push_back(new Activity(set->get(i)));
+            push_back(new Resource(set->get(i)));
         }
     }
 
-    virtual ~Activities()
-    { for(iterator it = begin(); it != end(); ++it) delete *it; }
+    virtual ~Resources()
+    { }
 
-    void clear()
+    void add(const Resources& r)
     {
-        for(iterator it = begin(); it != end(); ++it) delete *it;
-        std::vector < Activity* >::clear();
+        for (Resources::const_iterator itr = r.begin(); itr != r.end();
+             ++itr) {
+            push_back(*itr);
+        }
     }
 
-    void removeStartingActivities();
+    static Resources* build(const vle::value::Value& value)
+    { return new Resources(&value); }
 
-    void starting(const vle::devs::Time& time);
-
-    const result_t& startingActivities() const
-    { return mStartingActivities; }
+    static const vle::value::Value& get(const vle::devs::ExternalEvent* ee)
+    { return ee->getAttributeValue("resources"); }
 
     vle::value::Value* toValue() const
     {
@@ -81,19 +76,9 @@ public:
         }
         return value;
     }
-
-private:
-    friend std::ostream& operator<<(std::ostream& o, const Activities& a);
-
-    result_t mStartingActivities;
 };
 
-class ActivityFIFO : public std::list < Activity* >
-{
-public:
-    ActivityFIFO()
-    { }
-};
+std::ostream& operator<<(std::ostream& o, const Resources& r);
 
 } // namespace rcpsp
 

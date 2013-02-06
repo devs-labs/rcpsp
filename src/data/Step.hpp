@@ -29,9 +29,9 @@
 
 #include <vle/value/Value.hpp>
 
-#include <Location.hpp>
-#include <ResourceConstraints.hpp>
-#include <TemporalConstraints.hpp>
+#include <data/Location.hpp>
+#include <data/ResourceConstraints.hpp>
+#include <data/TemporalConstraints.hpp>
 
 namespace rcpsp {
 

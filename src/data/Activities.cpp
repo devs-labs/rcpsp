@@ -1,5 +1,5 @@
 /**
- * @file TemporalConstraints.cpp
+ * @file Activities.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -21,23 +21,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <TemporalConstraints.hpp>
+#include <data/Activities.hpp>
 
 namespace rcpsp {
 
-std::ostream& operator<<(std::ostream& o, const TemporalConstraints& tc)
+void Activities::removeStartingActivities()
 {
-    o << "(";
-    if (tc.mType == TemporalConstraints::NONE) o << "NONE ";
-    if (tc.mType & TemporalConstraints::ES) o << "ES ";
-    if (tc.mType & TemporalConstraints::LS) o << "LS ";
-    if (tc.mType & TemporalConstraints::EF) o << "EF ";
-    if (tc.mType & TemporalConstraints::LF) o << "LF ";
-    o << "| ";
-    o << tc.mEarlyStartTime << " | ";
-    o << tc.mLateStartTime << " | ";
-    o << tc.mEarlyFinishTime << " | ";
-    o << tc.mLateFinishTime << ")";
+    //TODO
+}
+
+void Activities::starting(const vle::devs::Time& time)
+{
+    mStartingActivities.clear();
+    for (Activities::const_iterator it = begin(); it != end(); ++it) {
+        if ((*it)->starting(time)) {
+            (*it)->wait(time);
+            mStartingActivities.push_back(*it);
+        }
+    }
+}
+
+std::ostream& operator<<(std::ostream& o, const Activities& a)
+{
+    o << "{ ";
+    for (Activities::const_iterator it = a.begin(); it != a.end(); ++it) {
+        o << **it << " ";
+    }
+    o << "}";
     return o;
 }
 

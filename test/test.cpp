@@ -29,8 +29,8 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-#include <Activity.hpp>
-#include <ResourcePool.hpp>
+#include <data/Activity.hpp>
+#include <data/ResourcePool.hpp>
 
 using namespace rcpsp;
 

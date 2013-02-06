@@ -1,5 +1,5 @@
 /**
- * @file devs/StepScheduler.hpp
+ * @file devs/Processor.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -27,25 +27,24 @@
 
 namespace rcpsp { namespace devs {
 
-class StepScheduler : public vle::devs::Dynamics
+class Processor : public vle::devs::Dynamics
 {
 public:
-    StepScheduler(const vle::devs::DynamicsInit& init,
-                  const vle::devs::InitEventList& events);
+    Processor(const vle::devs::DynamicsInit& init,
+              const vle::devs::InitEventList& events);
 
-    virtual void add(Activity* a) =0;
-    virtual bool another() const =0;
-    virtual bool empty() const =0;
-    virtual void next() =0;
-    virtual void remove(Activity* a) =0;
-    virtual Activity* select() const =0;
-    virtual vle::value::Value* observe() const =0;
+    virtual vle::devs::Time computeRemainingTime(
+        const vle::devs::Time& time) const =0;
+    virtual void done(const vle::devs::Time& time) =0;
+    virtual void finish(const vle::devs::Time& time) =0;
+    virtual bool idle() const =0;
+    virtual void start(const vle::devs::Time& time, Activity* a) =0;
 
     virtual vle::devs::Time init(const vle::devs::Time& /* time */);
-    virtual void output(const vle::devs::Time& time,
+    virtual void output(const vle::devs::Time& /* time */,
                         vle::devs::ExternalEventList& output) const;
     virtual vle::devs::Time timeAdvance() const;
-    virtual void internalTransition(const vle::devs::Time& /* time */);
+    virtual void internalTransition(const vle::devs::Time& time);
     virtual void externalTransition(
         const vle::devs::ExternalEventList& events,
         const vle::devs::Time& time);
@@ -55,17 +54,15 @@ public:
     virtual vle::value::Value* observation(
         const vle::devs::ObservationEvent& event) const;
 
-private:
-    enum Phase { WAIT_SCHEDULE, WAIT_ASSIGN, WAIT_RESOURCE, SEND_DEMAND,
-                 SEND_DONE, SEND_PROCESS, SEND_RELEASE, SEND_SCHEDULE };
+protected:
+    Activities mRunningActivities;
+    Activities mDoneActivities;
 
-    std::string mLocation;
+private:
+    enum Phase { IDLE, RUNNING, DONE };
 
     Phase mPhase;
-    Activity* mRunningActivity;
-    Activities mDoneActivities;
-    Activities mReleasedActivities;
-    Activities mSchedulingActivities;
+    vle::devs::Time mSigma;
 };
 
 } } // namespace devs rcpsp

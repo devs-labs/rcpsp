@@ -38,7 +38,7 @@ INSTALL(TARGETS Pool
   LIBRARY DESTINATION plugins/simulator)
 
 ADD_LIBRARY(Processor MODULE Processor.cpp)
-TARGET_LINK_LIBRARIES(Processor ${VLE_LIBRARIES} rcpsp-data)
+TARGET_LINK_LIBRARIES(Processor ${VLE_LIBRARIES} Processor-devs rcpsp-data)
 INSTALL(TARGETS Processor
   RUNTIME DESTINATION plugins/simulator
   LIBRARY DESTINATION plugins/simulator)

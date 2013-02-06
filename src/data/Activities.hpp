@@ -66,6 +66,71 @@ public:
         std::vector < Activity* >::clear();
     }
 
+    vle::value::Value* observe_activity() const
+    {
+        vle::value::Set* list = new vle::value::Set;
+
+        for (Activities::const_iterator it = begin(); it != end(); ++it) {
+            list->add(new vle::value::String((*it)->name()));
+        }
+        return list;
+    }
+
+    vle::value::Value* observe_step() const
+    {
+        vle::value::Set* list = new vle::value::Set;
+
+        for (Activities::const_iterator it = begin(); it != end(); ++it) {
+            list->add(new vle::value::String((*it)->current()->name()));
+        }
+        return list;
+    }
+
+    vle::value::Value* observe_used_resources() const
+    {
+        vle::value::Set* list = new vle::value::Set;
+
+        for (Activities::const_iterator it = begin(); it != end(); ++it) {
+            const Resources* resources = (*it)->allocatedResources();
+
+            for (Resources::const_iterator itr = resources->begin();
+                 itr != resources->end(); ++itr) {
+                list->add(new vle::value::String((*itr)->name()));
+            }
+        }
+        return list;
+    }
+
+    vle::value::Value* observe_used_resource_types() const
+    {
+        std::map < std::string, int > resourceNumber;
+
+        for (Activities::const_iterator it = begin(); it != end(); ++it) {
+            const Resources* resources = (*it)->allocatedResources();
+
+            for (Resources::const_iterator itr = resources->begin();
+                 itr != resources->end(); ++itr) {
+                if (resourceNumber.find((*itr)->type()) ==
+                    resourceNumber.end()) {
+                    resourceNumber[(*itr)->type()] = 0;
+                }
+                resourceNumber[(*itr)->type()]++;
+            }
+        }
+
+        vle::value::Set* list = new vle::value::Set;
+
+        for (std::map < std::string, int >::const_iterator it =
+                 resourceNumber.begin(); it != resourceNumber.end(); ++it) {
+            vle::value::Set* value = new vle::value::Set;
+
+            value->add(new vle::value::String(it->first));
+            value->add(new vle::value::Integer(it->second));
+            list->add(value);
+        }
+        return list;
+    }
+
     void removeStartingActivities();
 
     void starting(const vle::devs::Time& time);

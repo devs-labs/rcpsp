@@ -1,5 +1,5 @@
 /**
- * @file StepScheduler.cpp
+ * @file devs/StepScheduler.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -252,6 +252,15 @@ void StepScheduler::externalTransition(
         }
         ++it;
     }
+}
+
+void StepScheduler::confluentTransitions(
+    const vle::devs::Time& time,
+    const vle::devs::ExternalEventList& /* events */)
+{
+    TraceModel(vle::fmt(" [%1%:%2%] at %3% -> confluent !") %
+               getModel().getParentName() % getModelName() %
+               time);
 }
 
 vle::value::Value* StepScheduler::observation(

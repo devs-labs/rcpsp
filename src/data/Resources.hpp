@@ -80,6 +80,41 @@ public:
 
 std::ostream& operator<<(std::ostream& o, const Resources& r);
 
+class ResourceTypes : public std::map < std::string, unsigned int >
+{
+public:
+    ResourceTypes()
+    { }
+
+    ResourceTypes(const vle::value::Value* value)
+    {
+        const vle::value::Map* map =
+            dynamic_cast < const vle::value::Map* >(value);
+
+        for (vle::value::Map::const_iterator it = map->begin();
+             it != map->end(); ++it) {
+            insert(std::make_pair(it->first,
+                                  vle::value::toInteger(it->second)));
+        }
+    }
+
+    static ResourceTypes* build(const vle::value::Value& value)
+    { return new ResourceTypes(&value); }
+
+    static const vle::value::Value& get(const vle::devs::ExternalEvent* ee)
+    { return ee->getAttributeValue("resources"); }
+
+    vle::value::Value* toValue() const
+    {
+        vle::value::Map* value = new vle::value::Map;
+
+        for (const_iterator it = begin(); it != end(); ++it) {
+            value->add(it->first, new vle::value::Integer(it->second));
+        }
+        return value;
+    }
+};
+
 } // namespace rcpsp
 
 #endif

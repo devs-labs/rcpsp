@@ -2,7 +2,7 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.1.0.dtd">
 <vle_project version="1.0.1" date="sam., 10 mars 2012" author="Eric Ramat">
 <structures>
-<model name="Top model" type="coupled" x="0" y="0" width="847" height="594"  >
+<model name="Top model" type="coupled" x="0" y="0" width="847" height="446"  >
 <submodels>
 <model name="constructor" type="atomic" conditions="cond_constructor" dynamics="dyn_constructor" x="264" y="135" width="100" height="45" >
 <out>
@@ -32,19 +32,21 @@
 <dynamic name="dyn_pool_constructor" library="PoolConstructor" package="rcpsp"  />
 <dynamic name="dyn_processor" library="Processor" package="rcpsp"  />
 <dynamic name="dyn_step_scheduler" library="StepScheduler" package="rcpsp"  />
+<dynamic name="dyn_transport" library="Transport" package="rcpsp"  />
 </dynamics>
 <classes>
 <class name="Location" >
-<model name="location" type="coupled" x="251" y="20" width="1250" height="652"  >
+<model name="location" type="coupled" x="251" y="20" width="847" height="446"  >
 <in>
  <port name="schedule" />
 </in>
 <out>
  <port name="done" />
+ <port name="out_demand" />
  <port name="schedule" />
 </out>
 <submodels>
-<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="401" y="316" width="100" height="45" >
+<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="451" y="351" width="100" height="45" >
 <in>
  <port name="process" />
 </in>
@@ -52,7 +54,7 @@
  <port name="done" />
 </out>
 </model>
-<model name="scheduler" type="atomic" conditions="cond_step_scheduler" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="140" y="139" width="100" height="105" >
+<model name="scheduler" type="atomic" conditions="cond_step_scheduler" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="265" y="149" width="100" height="120" >
 <in>
  <port name="assign" />
  <port name="done" />
@@ -62,12 +64,21 @@
 <out>
  <port name="demand" />
  <port name="done" />
+ <port name="out_demand" />
  <port name="process" />
  <port name="release" />
  <port name="schedule" />
 </out>
 </model>
-<model name="ressource_manager" type="coupled" x="374" y="24" width="100" height="60"  >
+<model name="transport" type="atomic" conditions="cond_step_scheduler" dynamics="dyn_transport" x="81" y="154" width="100" height="45" >
+<in>
+ <port name="in" />
+</in>
+<out>
+ <port name="out" />
+</out>
+</model>
+<model name="ressource_manager" type="coupled" x="443" y="15" width="100" height="60"  >
 <in>
  <port name="demand" />
  <port name="release" />
@@ -115,12 +126,16 @@
  <destination model="location" port="done" />
 </connection>
 <connection type="output">
+ <origin model="scheduler" port="out_demand" />
+ <destination model="location" port="out_demand" />
+</connection>
+<connection type="output">
  <origin model="scheduler" port="schedule" />
  <destination model="location" port="schedule" />
 </connection>
 <connection type="input">
  <origin model="location" port="schedule" />
- <destination model="scheduler" port="schedule" />
+ <destination model="transport" port="in" />
 </connection>
 <connection type="internal">
  <origin model="processor" port="done" />
@@ -145,6 +160,10 @@
 <connection type="internal">
  <origin model="scheduler" port="release" />
  <destination model="ressource_manager" port="release" />
+</connection>
+<connection type="internal">
+ <origin model="transport" port="out" />
+ <destination model="scheduler" port="schedule" />
 </connection>
 </connections>
 </model>

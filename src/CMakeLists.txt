@@ -50,6 +50,12 @@ INSTALL(TARGETS StepScheduler
   RUNTIME DESTINATION plugins/simulator
   LIBRARY DESTINATION plugins/simulator)
 
+ADD_LIBRARY(Transport MODULE Transport.cpp)
+TARGET_LINK_LIBRARIES(Transport ${VLE_LIBRARIES} rcpsp-data)
+INSTALL(TARGETS Transport
+  RUNTIME DESTINATION plugins/simulator
+  LIBRARY DESTINATION plugins/simulator)
+
 ADD_SUBDIRECTORY(constructor)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(devs)

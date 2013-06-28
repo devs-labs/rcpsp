@@ -87,7 +87,7 @@ public:
     void output(const vle::devs::Time& /* time */,
                 vle::devs::ExternalEventList& output) const
     {
-        output.addEvent(buildEvent("start"));
+        output.push_back(buildEvent("start"));
     }
 
     vle::devs::Time timeAdvance() const

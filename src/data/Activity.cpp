@@ -209,6 +209,9 @@ std::ostream& operator<<(std::ostream& o, const Activity& a)
         o << " < " << (*a.mStepIterator)->name() << " >";
     }
     o << " , " << a.mTemporalConstraints << " ]";
+    if (a.mAllocatedResources) {
+        o << ", " << *a.mAllocatedResources;
+    }
     return o;
 }
 

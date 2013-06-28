@@ -61,7 +61,7 @@ public:
 
                 ee << vle::devs::attribute("type", it->type());
                 ee << vle::devs::attribute("quantity", (int)it->quantity());
-                output.addEvent(ee);
+                output.push_back(ee);
             }
         } else if (mPhase == SEND_DEMAND) {
             for (ResourceConstraints::const_iterator it =
@@ -76,7 +76,7 @@ public:
 
                 ee << vle::devs::attribute("type", it->type());
                 ee << vle::devs::attribute("quantity", (int)it->quantity());
-                output.addEvent(ee);
+                output.push_back(ee);
             }
         } else if (mPhase == SEND_RELEASE) {
             vle::devs::ExternalEvent* ee =
@@ -84,9 +84,14 @@ public:
 
             ee << vle::devs::attribute("resources",
                                        mReleasedResources->toValue());
-            output.addEvent(ee);
+            output.push_back(ee);
         } else if (mPhase == SEND_UNAVAILABLE) {
-            output.addEvent(buildEvent("unavailable"));
+            vle::devs::ExternalEvent* ee =
+                new vle::devs::ExternalEvent("unavailable");
+
+            ee << vle::devs::attribute("resources",
+                                       mUnavailableResources.toValue());
+            output.push_back(ee);
         }
     }
 
@@ -117,6 +122,7 @@ public:
                 mPhase = WAIT_DEMAND;
             }
         } else if (mPhase == SEND_UNAVAILABLE) {
+            mUnavailableResources.clear();
             mPhase = WAIT_DEMAND;
         }
     }
@@ -131,9 +137,13 @@ public:
             if ((*it)->onPort("available")) {
                 bool available = (*it)->getBooleanAttributeValue("available");
                 unsigned int number = (*it)->getIntegerAttributeValue("number");
+                std::string type = (*it)->getStringAttributeValue("type");
 
                 if (available) {
                     mAvailableResourceNumber += number;
+                } else {
+                    mUnavailableResources[type] =
+                        mResourceConstraints->quantity(type) - number;
                 }
                 ++mResponseNumber;
 
@@ -175,6 +185,14 @@ public:
         }
     }
 
+    void confluentTransitions(const vle::devs::Time& time,
+                              const vle::devs::ExternalEventList& /* events */)
+    {
+        TraceModel(vle::fmt(" [%1%:%2%] at %3% -> confluent !") %
+                   getModel().getParentName() % getModelName() %
+                   time);
+    }
+
     virtual vle::value::Value* observation(
         const vle::devs::ObservationEvent& /* event */) const
     {
@@ -198,6 +216,7 @@ private:
     unsigned int mResponseNumber;
     unsigned int mAvailableResourceNumber;
     Resources* mReleasedResources;
+    ResourceTypes mUnavailableResources;
 };
 
 } // namespace rcpsp

@@ -42,7 +42,7 @@ public:
 
     void output(const vle::devs::Time& /* time */,
                 vle::devs::ExternalEventList& output) const
-    { output.addEvent(buildEvent("out")); }
+    { output.push_back(buildEvent("out")); }
 };
 
 } // namespace rcpsp

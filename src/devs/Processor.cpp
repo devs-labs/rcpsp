@@ -49,7 +49,7 @@ void Processor::output(const vle::devs::Time& /* time */,
                 new vle::devs::ExternalEvent("done");
 
             ee << vle::devs::attribute("activity", (*it)->toValue());
-            output.addEvent(ee);
+            output.push_back(ee);
         }
     }
 }

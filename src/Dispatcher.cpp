@@ -61,7 +61,7 @@ public:
     {
         for (events::const_iterator it = mEvents.begin(); it != mEvents.end();
              ++it) {
-            output.addEvent(*it);
+            output.push_back(*it);
         }
     }
 

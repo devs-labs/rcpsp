@@ -36,6 +36,7 @@ StepScheduler::StepScheduler(const vle::devs::DynamicsInit& init,
 vle::devs::Time StepScheduler::init(const vle::devs::Time& /* time */)
 {
     mRunningActivity = 0;
+    mUnavailableResources = 0;
     mPhase = WAIT_SCHEDULE;
     return vle::devs::infinity;
 }
@@ -44,7 +45,7 @@ void StepScheduler::output(const vle::devs::Time& time,
                            vle::devs::ExternalEventList& output) const
 {
     if (mPhase == SEND_DEMAND) {
-        if (not empty()) {
+        if (not empty()) { // est ce utile ???
             Activity* a = select();
             ResourceConstraints rc = a->buildResourceConstraints();
 
@@ -57,12 +58,11 @@ void StepScheduler::output(const vle::devs::Time& time,
                            time % a->name());
 
                 ee << vle::devs::attribute("resources", rc.toValue());
-                output.addEvent(ee);
+                output.push_back(ee);
             }
         }
     } else if (mPhase == SEND_PROCESS) {
-        if (mRunningActivity)
-        {
+        if (mRunningActivity) { // est ce utile ???
             vle::devs::ExternalEvent* ee =
                 new vle::devs::ExternalEvent("process");
 
@@ -72,7 +72,7 @@ void StepScheduler::output(const vle::devs::Time& time,
 
             ee << vle::devs::attribute("activity",
                                        mRunningActivity->toValue());
-            output.addEvent(ee);
+            output.push_back(ee);
         }
     } else if (mPhase == SEND_SCHEDULE) {
         for(Activities::const_iterator it = mSchedulingActivities.begin();
@@ -83,7 +83,7 @@ void StepScheduler::output(const vle::devs::Time& time,
             ee << vle::devs::attribute("location",
                                        (*it)->location().name());
             ee << vle::devs::attribute("activity", (*it)->toValue());
-            output.addEvent(ee);
+            output.push_back(ee);
         }
     } else if (mPhase == SEND_DONE) {
         for(Activities::const_iterator it = mDoneActivities.begin();
@@ -97,7 +97,7 @@ void StepScheduler::output(const vle::devs::Time& time,
                 new vle::devs::ExternalEvent("done");
 
             ee << vle::devs::attribute("activity", (*it)->toValue());
-            output.addEvent(ee);
+            output.push_back(ee);
         }
     } else if (mPhase == SEND_RELEASE) {
         for(Activities::const_iterator it = mReleasedActivities.begin();
@@ -115,17 +115,24 @@ void StepScheduler::output(const vle::devs::Time& time,
 
                 ee << vle::devs::attribute(
                     "resources", releasedResources->toValue());
-                output.addEvent(ee);
+                output.push_back(ee);
             }
         }
+    } else if (mPhase == SEND_OUT_DEMAND) {
+        vle::devs::ExternalEvent* ee =
+            new vle::devs::ExternalEvent("out_demand");
+
+        ee << vle::devs::attribute("resources",
+                                   mUnavailableResources->toValue());
+        output.push_back(ee);
     }
 }
 
 vle::devs::Time StepScheduler::timeAdvance() const
 {
     if (mPhase == SEND_DEMAND or mPhase == SEND_DONE or
-        mPhase == SEND_PROCESS or mPhase == SEND_RELEASE or
-        mPhase == SEND_SCHEDULE) {
+        mPhase == SEND_OUT_DEMAND or mPhase == SEND_PROCESS or
+        mPhase == SEND_RELEASE or mPhase == SEND_SCHEDULE) {
         return 0;
     } else {
         return vle::devs::infinity;
@@ -153,6 +160,17 @@ void StepScheduler::internalTransition(const vle::devs::Time& /* time */)
         }
     } else if (mPhase == SEND_PROCESS) {
         if (mRunningActivity) {
+            const Resources& r = *mRunningActivity->allocatedResources();
+
+            for (unsigned int i = 0; i < r.size(); ++i) {
+                ResourceTypes::iterator it = mUsedResources.find(r[i]->type());
+
+                if (it == mUsedResources.end()) {
+                    mUsedResources[r[i]->type()] = 0;
+                }
+                ++mUsedResources[r[i]->type()];
+            }
+
             delete mRunningActivity;
             mRunningActivity = 0;
         }
@@ -243,11 +261,17 @@ void StepScheduler::externalTransition(
             mReleasedActivities.push_back(a);
             mPhase = SEND_RELEASE;
         }  else if ((*it)->onPort("unavailable")) {
-            if (another()) {
-                next();
-                mPhase = SEND_DEMAND;
+            if (demand()) {
+                mUnavailableResources = ResourceTypes::build(
+                    ResourceTypes::get(*it));
+                mPhase = SEND_OUT_DEMAND;
             } else {
-                mPhase = WAIT_RESOURCE;
+                if (another()) {
+                    next();
+                    mPhase = SEND_DEMAND;
+                } else {
+                    mPhase = WAIT_RESOURCE;
+                }
             }
         }
         ++it;

@@ -60,7 +60,8 @@ public:
 
             ee << vle::devs::attribute("available", mAvailable);
             ee << vle::devs::attribute("number", mAvailableNumber);
-            output.addEvent(ee);
+            ee << vle::devs::attribute("type", mPool.type());
+            output.push_back(ee);
         } else if (mPhase == SEND_ASSIGN) {
             vle::devs::ExternalEvent* ee =
                 new vle::devs::ExternalEvent("assign");
@@ -71,7 +72,7 @@ public:
 
             ee << vle::devs::attribute("resources",
                                        mDeliveredResources->toValue());
-            output.addEvent(ee);
+            output.push_back(ee);
         }
     }
 
@@ -132,7 +133,7 @@ public:
                         mAvailableNumber = quantity;
                     } else {
                         mAvailable = false;
-                        mAvailableNumber = 0;
+                        mAvailableNumber = mPool.quantity();
                     }
                     mPhase = SEND_AVAILABLE;
                 }
@@ -151,6 +152,14 @@ public:
             }
             ++it;
         }
+    }
+
+    void confluentTransitions(const vle::devs::Time& time,
+                              const vle::devs::ExternalEventList& /* events */)
+    {
+        TraceModel(vle::fmt(" [%1%:%2%] at %3% -> confluent !") %
+                   getModel().getParentName() % getModelName() %
+                   time);
     }
 
     virtual vle::value::Value* observation(

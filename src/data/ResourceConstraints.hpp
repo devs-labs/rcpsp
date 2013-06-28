@@ -57,6 +57,25 @@ public:
 
     bool checkResourceConstraint(const Resources& r) const;
 
+    unsigned int quantity(const std::string& type) const
+    {
+        const_iterator it = begin();
+        bool found = false;
+
+        while (it != end() and not found) {
+            if (it->type() == type) {
+                found = true;
+            } else {
+                ++it;
+            }
+        }
+        if (found) {
+            return it->quantity();
+        } else {
+            return 0;
+        }
+    }
+
     unsigned int quantity() const
     {
         unsigned int n = 0;

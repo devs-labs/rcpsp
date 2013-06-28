@@ -35,6 +35,7 @@ public:
 
     virtual void add(Activity* a) =0;
     virtual bool another() const =0;
+    virtual bool demand() const =0;
     virtual bool empty() const =0;
     virtual void next() =0;
     virtual void remove(Activity* a) =0;
@@ -57,7 +58,8 @@ public:
 
 private:
     enum Phase { WAIT_SCHEDULE, WAIT_ASSIGN, WAIT_RESOURCE, SEND_DEMAND,
-                 SEND_DONE, SEND_PROCESS, SEND_RELEASE, SEND_SCHEDULE };
+                 SEND_DONE, SEND_OUT_DEMAND, SEND_PROCESS, SEND_RELEASE,
+                 SEND_SCHEDULE };
 
     std::string mLocation;
 
@@ -66,6 +68,9 @@ private:
     Activities mDoneActivities;
     Activities mReleasedActivities;
     Activities mSchedulingActivities;
+
+    ResourceTypes* mUnavailableResources;
+    ResourceTypes mUsedResources;
 };
 
 } } // namespace devs rcpsp

@@ -41,6 +41,9 @@ public:
     virtual bool another() const
     { return false; }
 
+    virtual bool demand() const
+    { return false; }
+
     virtual void next()
     { }
 

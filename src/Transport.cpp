@@ -1,5 +1,5 @@
 /**
- * @file ActivityScheduler.cpp
+ * @file Transport.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -25,24 +25,23 @@
 
 #include <vle/utils/Trace.hpp>
 
-#include <data/Activity.hpp>
-#include <data/PrecedencesGraph.hpp>
+#include <data/Activities.hpp>
 
 namespace rcpsp {
 
-class ActivityScheduler : public vle::devs::Dynamics
+class Transport : public vle::devs::Dynamics
 {
 public:
-    ActivityScheduler(const vle::devs::DynamicsInit& init,
-                      const vle::devs::InitEventList& events) :
+    Transport(const vle::devs::DynamicsInit& init,
+              const vle::devs::InitEventList& events) :
         vle::devs::Dynamics(init, events),
-        mActivities(events.get("activities"))
+        mLocation(vle::value::toString(events.get("location")))
     {
     }
 
     vle::devs::Time init(const vle::devs::Time& /* time */)
     {
-        mPhase = INIT;
+        mPhase = WAIT;
         return vle::devs::infinity;
     }
 
@@ -50,13 +49,10 @@ public:
                 vle::devs::ExternalEventList& output) const
     {
         if (mPhase == SEND) {
-            const Activities::result_t& activities =
-                mActivities.startingActivities();
-
-            for(Activities::result_t::const_iterator it = activities.begin();
-                it != activities.end(); ++it) {
+            for(Activities::result_t::const_iterator it = mActivities.begin();
+                it != mActivities.end(); ++it) {
                 vle::devs::ExternalEvent* ee =
-                    new vle::devs::ExternalEvent((*it)->location().name());
+                    new vle::devs::ExternalEvent("out");
 
                 ee << vle::devs::attribute("location",
                                            (*it)->location().name());
@@ -75,6 +71,7 @@ public:
     void internalTransition(const vle::devs::Time& /* time */)
     {
         if (mPhase == SEND) {
+            mActivities.clear();
             mPhase = WAIT;
         }
     }
@@ -86,46 +83,34 @@ public:
         vle::devs::ExternalEventList::const_iterator it = events.begin();
 
         while (it != events.end()) {
-            if ((*it)->onPort("start")) {
-                if (mPhase == INIT) {
-                    mActivities.starting(time);
-                    if (mActivities.startingActivities().empty()) {
-                        mPhase = WAIT;
-                    } else {
-                        mPhase = SEND;
-                    }
+            if ((*it)->onPort("in")) {
+                if (Location::get(*it) == mLocation) {
+                    Activity* a = Activity::build(Activity::get(*it));
+
+                    TraceModel(
+                        vle::fmt(" [%1%:%2%] at %3% -> in = %4%/%5%") %
+                        getModel().getParentName() % getModelName() %
+                        time % a->current()->name() % a->name());
+
+                    mActivities.push_back(a);
+                    mPhase = SEND;
                 }
-            } else if ((*it)->onPort("done")) {
-                Activity* a = Activity::build(Activity::get(*it));
-
-                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% DONE") %
-                           getModel().getParentName() % getModelName() %
-                           time % a->name());
-
-                mDoneActivities.push_back(a);
             }
             ++it;
         }
     }
 
-    void confluentTransitions(const vle::devs::Time& time,
-                              const vle::devs::ExternalEventList& /* events */)
-    {
-        TraceModel(vle::fmt(" [%1%:%2%] at %3% -> confluent !") %
-                   getModel().getParentName() % getModelName() %
-                   time);
-    }
-
 private:
-    enum Phase { INIT, WAIT, SEND };
+    enum Phase { WAIT, SEND };
 
+    // parameters
+    std::string mLocation;
+
+    // state
     Phase mPhase;
-
     Activities mActivities;
-    Activities mDoneActivities;
-    PrecedencesGraph mPrecedencesGraph;
 };
 
 } // namespace rcpsp
 
-DECLARE_DYNAMICS(rcpsp::ActivityScheduler);
+DECLARE_DYNAMICS(rcpsp::Transport);

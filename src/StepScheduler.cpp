@@ -42,6 +42,9 @@ public:
     virtual bool another() const
     { return mPolicy->another(); }
 
+    virtual bool demand() const
+    { return mPolicy->demand(); }
+
     virtual bool empty() const
     { return mWaitingActivities.empty(); }
 

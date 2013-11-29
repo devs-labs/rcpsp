@@ -25,91 +25,169 @@
 
 #include <vle/utils/Trace.hpp>
 
-#include <data/Activities.hpp>
+#include <data/Activity.hpp>
+#include <data/Problem.hpp>
 
 namespace rcpsp {
 
-class Transport : public vle::devs::Dynamics
-{
-public:
-    Transport(const vle::devs::DynamicsInit& init,
-              const vle::devs::InitEventList& events) :
-        vle::devs::Dynamics(init, events),
-        mLocation(vle::value::toString(events.get("location")))
+    class Transport : public vle::devs::Dynamics
     {
-    }
+        typedef std::vector < Activity* > Activities;
+        typedef std::vector < vle::devs::Time > Dates;
 
-    vle::devs::Time init(const vle::devs::Time& /* time */)
-    {
-        mPhase = WAIT;
-        return vle::devs::infinity;
-    }
-
-    void output(const vle::devs::Time& /* time */,
-                vle::devs::ExternalEventList& output) const
-    {
-        if (mPhase == SEND) {
-            for(Activities::result_t::const_iterator it = mActivities.begin();
-                it != mActivities.end(); ++it) {
-                vle::devs::ExternalEvent* ee =
-                    new vle::devs::ExternalEvent("out");
-
-                ee << vle::devs::attribute("location",
-                                           (*it)->location().name());
-                ee << vle::devs::attribute("activity", (*it)->toValue());
-                output.push_back(ee);
-            }
+    public:
+        Transport(const vle::devs::DynamicsInit& init,
+                  const vle::devs::InitEventList& events) :
+            vle::devs::Dynamics(init, events),
+            mLocation(vle::value::toString(events.get("location"))),
+            mDurations(events.get("durations"))
+        {
         }
-    }
 
-    vle::devs::Time timeAdvance() const
-    {
-        if (mPhase == SEND) return 0;
-        else return vle::devs::infinity;
-    }
-
-    void internalTransition(const vle::devs::Time& /* time */)
-    {
-        if (mPhase == SEND) {
-            mActivities.clear();
-            mPhase = WAIT;
+        vle::devs::Time init(const vle::devs::Time& /* time */)
+        {
+            mSigma = vle::devs::infinity;
+            mLastTime = 0;
+            return vle::devs::infinity;
         }
-    }
 
-    void externalTransition(
-        const vle::devs::ExternalEventList& events,
-        const vle::devs::Time& time)
-    {
-        vle::devs::ExternalEventList::const_iterator it = events.begin();
+        void output(const vle::devs::Time& time,
+                    vle::devs::ExternalEventList& output) const
+        {
+            unsigned int i = 0;
 
-        while (it != events.end()) {
-            if ((*it)->onPort("in")) {
-                if (Location::get(*it) == mLocation) {
-                    Activity* a = Activity::build(Activity::get(*it));
+            for(Activities::const_iterator it = mActivities.begin();
+                it != mActivities.end(); ++it, ++i) {
 
-                    TraceModel(
-                        vle::fmt(" [%1%:%2%] at %3% -> in = %4%/%5%") %
-                        getModel().getParentName() % getModelName() %
-                        time % a->current()->name() % a->name());
+                if (time == mOutDates[i]) {
+                    vle::devs::ExternalEvent* ee =
+                        new vle::devs::ExternalEvent("out");
 
-                    mActivities.push_back(a);
-                    mPhase = SEND;
+                    ee << vle::devs::attribute("location",
+                                               (*it)->location().name());
+                    ee << vle::devs::attribute("activity", (*it)->toValue());
+                    output.push_back(ee);
                 }
             }
-            ++it;
         }
-    }
 
-private:
-    enum Phase { WAIT, SEND };
+        vle::devs::Time timeAdvance() const
+        {
+            return mSigma;
+        }
 
-    // parameters
-    std::string mLocation;
+        void internalTransition(const vle::devs::Time& time)
+        {
+            Activities::iterator ita = mActivities.begin();
+            Dates::iterator itd = mOutDates.begin();
 
-    // state
-    Phase mPhase;
-    Activities mActivities;
-};
+            while (ita != mActivities.end()) {
+                if (*itd == time) {
+                    mOutDates.erase(itd);
+                    mActivities.erase(ita);
+                    ita = mActivities.begin();
+                    itd = mOutDates.begin();
+                } else {
+                    ++ita;
+                    ++itd;
+                }
+            }
+            if (mOutDates.empty()) {
+                mSigma = vle::devs::infinity;
+            } else {
+                double min = *min_element(mOutDates.begin(), mOutDates.end());
+
+                mSigma = min - time;
+            }
+            mLastTime = time;
+        }
+
+        void externalTransition(
+            const vle::devs::ExternalEventList& events,
+            const vle::devs::Time& time)
+        {
+            vle::devs::ExternalEventList::const_iterator it = events.begin();
+
+            while (it != events.end()) {
+                if ((*it)->onPort("in")) {
+                    if (Location::get(*it) == mLocation) {
+                        Activity* a = Activity::build(Activity::get(*it));
+                        vle::devs::Time outDate;
+
+                        TraceModel(
+                            vle::fmt(" [%1%:%2%] at %3% -> in = %4%/%5%") %
+                            getModel().getParentName() % getModelName() %
+                            time % a->current()->name() % a->name());
+
+                        if (a->begin()) {
+                            outDate = time;
+                        } else {
+                            std::string previousLocation =
+                                (*it)->getStringAttributeValue("previous");
+
+                            outDate = time + mDurations[previousLocation];
+
+                            TraceModel(
+                                vle::fmt(
+                                    " [%1%:%2%] at %3% -> previous = %4%") %
+                                getModel().getParentName() % getModelName() %
+                                time % previousLocation);
+                            TraceModel(
+                                vle::fmt(" [%1%:%2%] at %3% -> date = %4%") %
+                                getModel().getParentName() % getModelName() %
+                                time % outDate);
+
+                        }
+
+                        if (mOutDates.empty()) {
+                            mSigma = outDate - time;
+                        } else {
+                            mSigma -= time - mLastTime;
+                            if (outDate < time + mSigma) {
+                                mSigma = outDate - time;
+                            }
+                        }
+                        mOutDates.push_back(outDate);
+                        mLastTime = time;
+
+                        TraceModel(
+                            vle::fmt(" [%1%:%2%] at %3% -> next date = %4%") %
+                            getModel().getParentName() % getModelName() %
+                            time % (time + mSigma));
+
+                        mActivities.push_back(a);
+                    }
+                }
+                ++it;
+            }
+        }
+
+        vle::value::Value* observation(
+            const vle::devs::ObservationEvent& event) const
+        {
+            if (event.onPort("transport")) {
+                vle::value::Set* value = new vle::value::Set;
+
+                for(Activities::const_iterator it = mActivities.begin();
+                    it != mActivities.end(); ++it) {
+                    value->add(new vle::value::String((*it)->name()));
+                }
+                return value;
+            }
+            return 0;
+        }
+
+    private:
+        // parameters
+        std::string mLocation;
+        Durations mDurations;
+
+        // state
+        vle::devs::Time mSigma;
+        vle::devs::Time mLastTime;
+        Activities mActivities;
+        Dates mOutDates;
+    };
 
 } // namespace rcpsp
 

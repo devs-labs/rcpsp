@@ -27,65 +27,65 @@
 
 namespace rcpsp {
 
-class PoolConstructor : public vle::devs::Executive
-{
-public:
-    PoolConstructor(const vle::devs::ExecutiveInit& init,
-                    const vle::devs::InitEventList& events) :
-	vle::devs::Executive(init, events),
-        mPools(events.get("pools"))
+    class PoolConstructor : public vle::devs::Executive
     {
-    }
-
-    virtual ~PoolConstructor() { }
-
-    void createPool(const std::string& name, const pool_t& pool)
-    {
-        // condition
-        vle::value::Set* value = new vle::value::Set;
-
-        value->add(new vle::value::String(name));
-        value->add(new vle::value::String(pool.first));
-
-        vle::value::Set* resources = new vle::value::Set();
-
-        for (resources_t::const_iterator itr = pool.second.begin();
-             itr != pool.second.end(); ++itr) {
-            vle::value::Set* resource = new vle::value::Set();
-
-            resource->add(new vle::value::String(*itr));
-            resource->add(new vle::value::String(pool.first));
-            resources->add(resource);
+    public:
+        PoolConstructor(const vle::devs::ExecutiveInit& init,
+                        const vle::devs::InitEventList& events) :
+            vle::devs::Executive(init, events),
+            mPools(events.get("pools"))
+        {
         }
-        value->add(resources);
 
-        conditions().get("cond_pool").setValueToPort(
-            "pool", *value);
+        virtual ~PoolConstructor() { }
 
-        // create models
-        createModelFromClass("Pool", name);
+        void createPool(const std::string& name, const pool_t& pool)
+        {
+            // condition
+            vle::value::Set* value = new vle::value::Set;
 
-        // connections
-        addConnection("assignment", "assign", name, "assign");
-        addConnection("assignment", "demand", name, "demand");
-        addConnection("assignment", "release", name, "release");
+            value->add(new vle::value::String(name));
+            value->add(new vle::value::String(pool.first));
 
-        addConnection(name, "available", "assignment", "available");
-        addConnection(name, "assign", coupledmodelName(), "assign");
-    }
+            vle::value::Set* resources = new vle::value::Set();
 
-    vle::devs::Time init(const vle::devs::Time& /* time */)
-    {
-        for (pools_t::const_iterator it = mPools.pools().begin();
-             it != mPools.pools().end(); ++it) {
-            createPool(it->first, it->second);
+            for (resources_t::const_iterator itr = pool.second.begin();
+                 itr != pool.second.end(); ++itr) {
+                vle::value::Set* resource = new vle::value::Set();
+
+                resource->add(new vle::value::String(*itr));
+                resource->add(new vle::value::String(pool.first));
+                resources->add(resource);
+            }
+            value->add(resources);
+
+            conditions().get("cond_pool").setValueToPort(
+                "pool", *value);
+
+            // create models
+            createModelFromClass("Pool", name);
+
+            // connections
+            addConnection("assignment", "assign", name, "assign");
+            addConnection("assignment", "demand", name, "demand");
+            addConnection("assignment", "release", name, "release");
+
+            addConnection(name, "available", "assignment", "available");
+            addConnection(name, "assign", coupledmodelName(), "assign");
         }
-        return vle::devs::infinity;
-    }
 
-private:
-    Pools mPools;
-};
+        vle::devs::Time init(const vle::devs::Time& /* time */)
+        {
+            for (pools_t::const_iterator it = mPools.pools().begin();
+                 it != mPools.pools().end(); ++it) {
+                createPool(it->first, it->second);
+            }
+            return vle::devs::infinity;
+        }
+
+    private:
+        Pools mPools;
+    };
 
 } // namespace rcpsp
 

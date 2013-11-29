@@ -29,81 +29,89 @@
 
 namespace rcpsp {
 
-class Constructor : public vle::devs::Executive
-{
-public:
-    Constructor(const vle::devs::ExecutiveInit& init,
-                const vle::devs::InitEventList& events) :
-	vle::devs::Executive(init, events),
-        mLocations(events.get("locations"))
-    { }
-
-    virtual ~Constructor() { }
-
-    void createLocation(const std::string& name, const Pools& pools)
+    class Constructor : public vle::devs::Executive
     {
-        // condition
-        conditions().get("cond_step_scheduler").setValueToPort(
-            "location", vle::value::String(name));
-        conditions().get("cond_pool_constructor").setValueToPort(
-            "pools", *pools.toValue());
+    public:
+        Constructor(const vle::devs::ExecutiveInit& init,
+                    const vle::devs::InitEventList& events) :
+            vle::devs::Executive(init, events),
+            mLocations(events.get("locations"))
+        { }
 
-        // create models
-        createModelFromClass("Location", name);
+        virtual ~Constructor() { }
 
-        // ports
-        addOutputPort("scheduler", name);
+        void createLocation(const std::string& name, const Pools& pools,
+            const Durations& durations)
+        {
+            // condition
+            conditions().get("cond_step_scheduler").setValueToPort(
+                "location", vle::value::String(name));
+            conditions().get("cond_pool_constructor").setValueToPort(
+                "pools", *pools.toValue());
+            conditions().get("cond_transport").setValueToPort(
+                "durations", *durations.toValue());
 
-        // connections
-        addConnection("scheduler", name, name, "schedule");
-        addConnection(name, "done", "scheduler", "done");
-    }
+            // create models
+            createModelFromClass("Location", name);
 
-    void createNetwork()
-    {
-        for (locations_t::const_iterator it = mLocations.locations().begin();
-             it != mLocations.locations().end(); ++it) {
-            for (locations_t::const_iterator it2 =
+            // ports
+            addOutputPort("scheduler", name);
+
+            // connections
+            addConnection("scheduler", name, name, "schedule");
+            addConnection(name, "done", "scheduler", "done");
+        }
+
+        void createNetwork()
+        {
+            for (locations_t::const_iterator it =
                      mLocations.locations().begin();
-                 it2 != mLocations.locations().end(); ++it2) {
-                if (it->first != it2->first) {
-                    addConnection(it->first, "schedule",
-                                  it2->first, "schedule");
+                 it != mLocations.locations().end(); ++it) {
+                for (locations_t::const_iterator it2 =
+                         mLocations.locations().begin();
+                     it2 != mLocations.locations().end(); ++it2) {
+                    if (it->first != it2->first) {
+                        addConnection(it->first, "schedule",
+                                      it2->first, "schedule");
+                    }
                 }
             }
         }
-    }
 
-    vle::devs::Time init(const vle::devs::Time& /* time */)
-    {
-        for (locations_t::const_iterator it = mLocations.locations().begin();
-             it != mLocations.locations().end(); ++it) {
-            createLocation(it->first, it->second);
+        vle::devs::Time init(const vle::devs::Time& /* time */)
+        {
+            locations_t::const_iterator itl =
+                mLocations.locations().begin();
+            durations_t::const_iterator itd =
+                mLocations.durations().begin();
+
+            for (;itl != mLocations.locations().end(); ++itl, ++itd) {
+                createLocation(itl->first, itl->second, itd->second);
+            }
+            createNetwork();
+            return 0;
         }
-        createNetwork();
-        return 0;
-    }
 
-    void output(const vle::devs::Time& /* time */,
-                vle::devs::ExternalEventList& output) const
-    {
-        output.push_back(buildEvent("start"));
-    }
+        void output(const vle::devs::Time& /* time */,
+                    vle::devs::ExternalEventList& output) const
+        {
+            output.push_back(buildEvent("start"));
+        }
 
-    vle::devs::Time timeAdvance() const
-    {
-        return vle::devs::infinity;
-    }
+        vle::devs::Time timeAdvance() const
+        {
+            return vle::devs::infinity;
+        }
 
-    void internalTransition(const vle::devs::Time& /* time */)
-    {
-        std::ofstream file("output.vpz");
-        dump(file, "experiment");
-    }
+        void internalTransition(const vle::devs::Time& /* time */)
+        {
+            std::ofstream file("output.vpz");
+            dump(file, "experiment");
+        }
 
-private:
-    Locations mLocations;
-};
+    private:
+        Locations mLocations;
+    };
 
 } // namespace rcpsp
 

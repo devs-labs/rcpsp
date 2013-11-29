@@ -25,58 +25,58 @@
 
 namespace rcpsp {
 
-class ActivityPilot : public vle::devs::Dynamics
-{
-public:
-    ActivityPilot(const vle::devs::DynamicsInit& init,
-                  const vle::devs::InitEventList& events) :
-        vle::devs::Dynamics(init, events)
+    class ActivityPilot : public vle::devs::Dynamics
     {
-    }
-
-    vle::devs::Time init(const vle::devs::Time& /* time */)
-    {
-        return vle::devs::infinity;
-    }
-
-    void output(const vle::devs::Time& /* time */,
-                vle::devs::ExternalEventList& output) const
-    {
-    }
-
-    vle::devs::Time timeAdvance() const
-    {
-        return vle::devs::infinity;
-    }
-
-    void internalTransition(const vle::devs::Time& /* time */)
-    {
-    }
-
-    void externalTransition(
-        const vle::devs::ExternalEventList& events,
-        const vle::devs::Time& time)
-    {
-        vle::devs::ExternalEventList::const_iterator it = events.begin();
-
-        while (it != events.end()) {
-            if ((*it)->onPort("start")) {
-            }
-            ++it;
+    public:
+        ActivityPilot(const vle::devs::DynamicsInit& init,
+                      const vle::devs::InitEventList& events) :
+            vle::devs::Dynamics(init, events)
+        {
         }
-    }
 
-    virtual vle::value::Value* observation(
-        const vle::devs::ObservationEvent& event) const
-    {
-        return 0;
-    }
+        vle::devs::Time init(const vle::devs::Time& /* time */)
+        {
+            return vle::devs::infinity;
+        }
 
-private:
-    enum Phase { INIT, RUN, DONE };
+        void output(const vle::devs::Time& /* time */,
+                    vle::devs::ExternalEventList& output) const
+        {
+        }
 
-    Phase mPhase;
-};
+        vle::devs::Time timeAdvance() const
+        {
+            return vle::devs::infinity;
+        }
+
+        void internalTransition(const vle::devs::Time& /* time */)
+        {
+        }
+
+        void externalTransition(
+            const vle::devs::ExternalEventList& events,
+            const vle::devs::Time& time)
+        {
+            vle::devs::ExternalEventList::const_iterator it = events.begin();
+
+            while (it != events.end()) {
+                if ((*it)->onPort("start")) {
+                }
+                ++it;
+            }
+        }
+
+        virtual vle::value::Value* observation(
+            const vle::devs::ObservationEvent& event) const
+        {
+            return 0;
+        }
+
+    private:
+        enum Phase { INIT, RUN, DONE };
+
+        Phase mPhase;
+    };
 
 } // namespace rcpsp
 

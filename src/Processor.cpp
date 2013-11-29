@@ -27,67 +27,67 @@
 
 namespace rcpsp {
 
-class Processor : public devs::Processor
-{
-public:
-    Processor(const vle::devs::DynamicsInit& init,
-              const vle::devs::InitEventList& events) :
-        devs::Processor(init, events)
-    { }
-
-    vle::devs::Time computeRemainingTime(const vle::devs::Time& time) const
+    class Processor : public devs::Processor
     {
-        vle::devs::Time min = vle::devs::infinity;
+    public:
+        Processor(const vle::devs::DynamicsInit& init,
+                  const vle::devs::InitEventList& events) :
+            devs::Processor(init, events)
+        { }
 
-        for(Activities::const_iterator it = mRunningActivities.begin();
-            it != mRunningActivities.end(); ++it) {
-            vle::devs::Time rt = (*it)->remainingTime(time);
+        vle::devs::Time computeRemainingTime(const vle::devs::Time& time) const
+        {
+            vle::devs::Time min = vle::devs::infinity;
 
-            if (rt < min) {
-                min = rt;
+            for(Activities::const_iterator it = mRunningActivities.begin();
+                it != mRunningActivities.end(); ++it) {
+                vle::devs::Time rt = (*it)->remainingTime(time);
+
+                if (rt < min) {
+                    min = rt;
+                }
+            }
+            return min;
+        }
+
+        virtual void done(const vle::devs::Time& /* time */)
+        { mDoneActivities.clear(); }
+
+        virtual void finish(const vle::devs::Time& time)
+        {
+            Activities::iterator it = mRunningActivities.begin();
+
+            while (it != mRunningActivities.end()) {
+                if ((*it)->done(time)) {
+
+                    TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% finishs") %
+                               getModel().getParentName() % getModelName() %
+                               time % (*it)->name());
+
+                    (*it)->finish(time);
+                    mDoneActivities.push_back(*it);
+                    mRunningActivities.erase(it);
+                    it = mRunningActivities.begin();
+                } else {
+                    ++it;
+                }
             }
         }
-        return min;
-    }
 
-    virtual void done(const vle::devs::Time& /* time */)
-    { mDoneActivities.clear(); }
+        virtual bool idle() const
+        { return mRunningActivities.empty(); }
 
-    virtual void finish(const vle::devs::Time& time)
-    {
-        Activities::iterator it = mRunningActivities.begin();
+        virtual void start(const vle::devs::Time& time, Activity* a)
+        {
+            TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% starts") %
+                       getModel().getParentName() % getModelName() %
+                       time % a->name());
 
-        while (it != mRunningActivities.end()) {
-            if ((*it)->done(time)) {
-
-                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% finishs") %
-                           getModel().getParentName() % getModelName() %
-                           time % (*it)->name());
-
-                (*it)->finish(time);
-                mDoneActivities.push_back(*it);
-                mRunningActivities.erase(it);
-                it = mRunningActivities.begin();
-            } else {
-                ++it;
-            }
+            a->start(time);
+            mRunningActivities.push_back(a);
         }
-    }
 
-    virtual bool idle() const
-    { return mRunningActivities.empty(); }
-
-    virtual void start(const vle::devs::Time& time, Activity* a)
-    {
-        TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% starts") %
-                   getModel().getParentName() % getModelName() %
-                   time % a->name());
-
-        a->start(time);
-        mRunningActivities.push_back(a);
-    }
-
-};
+    };
 
 } // namespace rcpsp
 

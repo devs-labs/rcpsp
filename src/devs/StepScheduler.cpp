@@ -80,6 +80,7 @@ void StepScheduler::output(const vle::devs::Time& time,
             vle::devs::ExternalEvent* ee =
                 new vle::devs::ExternalEvent("schedule");
 
+            ee << vle::devs::attribute("previous", mLocation);
             ee << vle::devs::attribute("location",
                                        (*it)->location().name());
             ee << vle::devs::attribute("activity", (*it)->toValue());
@@ -112,6 +113,10 @@ void StepScheduler::output(const vle::devs::Time& time,
             if (not releasedResources->empty()) {
                 vle::devs::ExternalEvent* ee =
                     new vle::devs::ExternalEvent("release");
+
+		TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% - release => %5%")
+			   % getModel().getParentName() % getModelName() %
+			   time % (*it)->name() % *releasedResources);
 
                 ee << vle::devs::attribute(
                     "resources", releasedResources->toValue());
@@ -174,11 +179,15 @@ void StepScheduler::internalTransition(const vle::devs::Time& /* time */)
             delete mRunningActivity;
             mRunningActivity = 0;
         }
-        if (empty()) {
-            mPhase = WAIT_SCHEDULE;
-        } else {
-            mPhase = SEND_DEMAND;
-        }
+	if (not mReleasedActivities.empty()) {
+            mPhase = SEND_RELEASE;
+	} else {
+            if (empty()) {
+                mPhase = WAIT_SCHEDULE;
+            } else {
+                mPhase = SEND_DEMAND;
+            }
+	}
     } else if (mPhase == SEND_RELEASE) {
         while (not mReleasedActivities.empty()) {
             Activity* a = mReleasedActivities.back();
@@ -227,7 +236,13 @@ void StepScheduler::externalTransition(
                 add(a);
                 if (mPhase == WAIT_SCHEDULE) {
                     mPhase = SEND_DEMAND;
-                }
+                } else if (mPhase == WAIT_RESOURCE) {
+                    if (a->buildResourceConstraints().empty()) {
+                        mRunningActivity = a;
+                        remove(a);
+                        mPhase = SEND_PROCESS;
+                    }
+		}
             }
         } else if ((*it)->onPort("assign")) {
             Resources* r = Resources::build(Resources::get(*it));
@@ -259,7 +274,9 @@ void StepScheduler::externalTransition(
             Activity* a = Activity::build(Activity::get(*it));
 
             mReleasedActivities.push_back(a);
-            mPhase = SEND_RELEASE;
+	    if (mPhase == WAIT_SCHEDULE or mPhase == WAIT_RESOURCE) {
+                mPhase = SEND_RELEASE;
+	    }
         }  else if ((*it)->onPort("unavailable")) {
             if (demand()) {
                 mUnavailableResources = ResourceTypes::build(
@@ -270,7 +287,11 @@ void StepScheduler::externalTransition(
                     next();
                     mPhase = SEND_DEMAND;
                 } else {
-                    mPhase = WAIT_RESOURCE;
+                    if (not mReleasedActivities.empty()) {
+                        mPhase = SEND_RELEASE;
+                    } else {
+                        mPhase = WAIT_RESOURCE;
+                    }
                 }
             }
         }
@@ -280,11 +301,14 @@ void StepScheduler::externalTransition(
 
 void StepScheduler::confluentTransitions(
     const vle::devs::Time& time,
-    const vle::devs::ExternalEventList& /* events */)
+    const vle::devs::ExternalEventList& events)
 {
     TraceModel(vle::fmt(" [%1%:%2%] at %3% -> confluent !") %
                getModel().getParentName() % getModelName() %
                time);
+
+    internalTransition(time);
+    externalTransition(events, time);
 }
 
 vle::value::Value* StepScheduler::observation(

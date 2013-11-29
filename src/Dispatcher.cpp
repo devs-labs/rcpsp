@@ -27,83 +27,84 @@
 
 namespace rcpsp {
 
-class Dispatcher : public vle::devs::Dynamics
-{
-public:
-    Dispatcher(const vle::devs::DynamicsInit& init,
-               const vle::devs::InitEventList& events) :
-        vle::devs::Dynamics(init, events)
+    class Dispatcher : public vle::devs::Dynamics
     {
-    }
-
-    vle::devs::ExternalEvent* cloneExternalEvent(
-        vle::devs::ExternalEvent* event, const std::string& portName) const
-    {
-        vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent(
-            portName);
-        vle::value::Map::const_iterator it = event->getAttributes().begin();
-
-        while (it != event->getAttributes().end()) {
-            ee->putAttribute(it->first, it->second->clone());
-            ++it;
+    public:
+        Dispatcher(const vle::devs::DynamicsInit& init,
+                   const vle::devs::InitEventList& events) :
+            vle::devs::Dynamics(init, events)
+        {
         }
-        return ee;
-    }
 
-    vle::devs::Time init(const vle::devs::Time& /* time */)
-    {
-        mPhase = IDLE;
-        return vle::devs::infinity;
-    }
+        vle::devs::ExternalEvent* cloneExternalEvent(
+            vle::devs::ExternalEvent* event, const std::string& portName) const
+        {
+            vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent(
+                portName);
+            vle::value::Map::const_iterator it = event->getAttributes().begin();
 
-    void output(const vle::devs::Time& /* time */,
-                vle::devs::ExternalEventList& output) const
-    {
-        for (events::const_iterator it = mEvents.begin(); it != mEvents.end();
-             ++it) {
-            output.push_back(*it);
+            while (it != event->getAttributes().end()) {
+                ee->putAttribute(it->first, it->second->clone());
+                ++it;
+            }
+            return ee;
         }
-    }
 
-    vle::devs::Time timeAdvance() const
-    {
-        if (mPhase == IDLE) {
+        vle::devs::Time init(const vle::devs::Time& /* time */)
+        {
+            mPhase = IDLE;
             return vle::devs::infinity;
-        } else {
-            return 0;
         }
-    }
 
-    void internalTransition(const vle::devs::Time& /* time */)
-    {
-        mEvents.clear();
-        mPhase = IDLE;
-    }
-
-    void externalTransition(
-        const vle::devs::ExternalEventList& events,
-        const vle::devs::Time& /* time */)
-    {
-        vle::devs::ExternalEventList::const_iterator it = events.begin();
-
-        while (it != events.end()) {
-            std::string location = Location::get(*it);
-            vle::devs::ExternalEvent* ee = cloneExternalEvent(*it, location);
-
-            mEvents.push_back(ee);
-            mPhase = SEND;
-            ++it;
+        void output(const vle::devs::Time& /* time */,
+                    vle::devs::ExternalEventList& output) const
+        {
+            for (events::const_iterator it = mEvents.begin();
+                 it != mEvents.end(); ++it) {
+                output.push_back(*it);
+            }
         }
-    }
 
-private:
-    enum phase { IDLE, SEND };
+        vle::devs::Time timeAdvance() const
+        {
+            if (mPhase == IDLE) {
+                return vle::devs::infinity;
+            } else {
+                return 0;
+            }
+        }
 
-    typedef std::list < vle::devs::ExternalEvent* > events;
+        void internalTransition(const vle::devs::Time& /* time */)
+        {
+            mEvents.clear();
+            mPhase = IDLE;
+        }
 
-    phase mPhase;
-    events mEvents;
-};
+        void externalTransition(
+            const vle::devs::ExternalEventList& events,
+            const vle::devs::Time& /* time */)
+        {
+            vle::devs::ExternalEventList::const_iterator it = events.begin();
+
+            while (it != events.end()) {
+                std::string location = Location::get(*it);
+                vle::devs::ExternalEvent* ee =
+                    cloneExternalEvent(*it, location);
+
+                mEvents.push_back(ee);
+                mPhase = SEND;
+                ++it;
+            }
+        }
+
+    private:
+        enum phase { IDLE, SEND };
+
+        typedef std::list < vle::devs::ExternalEvent* > events;
+
+        phase mPhase;
+        events mEvents;
+    };
 
 } // namespace rcpsp
 

@@ -71,6 +71,9 @@ public:
 
     void assign(Resources* r);
 
+  bool begin() const 
+  { return mStepIterator == mSteps->begin(); }
+
     static Activity* build(const vle::value::Value& value)
     { return new Activity(&value); }
 

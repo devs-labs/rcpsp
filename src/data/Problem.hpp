@@ -89,7 +89,37 @@ private:
     pools_t mPools;
 };
 
+class Durations : public std::map < std::string, double >
+{
+public:
+    Durations()
+    { }
+
+    Durations(const vle::value::Value* value)
+    {
+        const vle::value::Map* durations =
+            dynamic_cast < const vle::value::Map* >(value);
+
+        for (vle::value::Map::const_iterator itd = durations->begin();
+             itd != durations->end(); ++itd) {
+            operator[](itd->first) =
+                vle::value::toDouble(itd->second);
+        }
+    }
+
+    vle::value::Value* toValue() const
+    {
+        vle::value::Map* value = new vle::value::Map;
+
+        for (const_iterator it = begin(); it != end(); ++it) {
+            value->add(it->first, new vle::value::Double(it->second));
+        }
+        return value;
+    }
+};
+
 typedef std::map < std::string, Pools > locations_t;
+typedef std::map < std::string, Durations > durations_t;
 
 class Locations
 {
@@ -104,15 +134,23 @@ public:
 
         for (vle::value::Map::const_iterator it = locations->begin();
              it != locations->end(); ++it) {
-            mLocations[it->first] = Pools(it->second);
+            const vle::value::Map* location =
+                dynamic_cast < const vle::value::Map* >(it->second);
+
+            mLocations[it->first] = Pools(location->get("pools"));
+            mDurations[it->first] = Durations(location->get("transport"));
         }
     }
+
+    const durations_t& durations() const
+    { return mDurations; }
 
     const locations_t& locations() const
     { return mLocations; }
 
     vle::value::Value* toValue() const
     {
+        // TODO: add transport duration !
         vle::value::Map* value = new vle::value::Map;
 
         for (locations_t::const_iterator it = mLocations.begin();
@@ -124,6 +162,7 @@ public:
 
 private:
     locations_t mLocations;
+    durations_t mDurations;
 };
 
 } // namespace rcpsp

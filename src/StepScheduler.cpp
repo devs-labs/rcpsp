@@ -26,49 +26,50 @@
 
 namespace rcpsp {
 
-class StepScheduler : public devs::StepScheduler
-{
-public:
-    StepScheduler(const vle::devs::DynamicsInit& init,
-                  const vle::devs::InitEventList& events) :
-        devs::StepScheduler(init, events)
+    class StepScheduler : public devs::StepScheduler
     {
-        mPolicy = new FIFOPolicy(mWaitingActivities);
-    }
+    public:
+        StepScheduler(const vle::devs::DynamicsInit& init,
+                      const vle::devs::InitEventList& events) :
+            devs::StepScheduler(init, events)
+        {
+            mPolicy = new FIFOPolicy(mWaitingActivities);
+        }
 
-    virtual void add(Activity* a)
-    { mPolicy->add(a); }
+        virtual void add(Activity* a)
+        { mPolicy->add(a); }
 
-    virtual bool another() const
-    { return mPolicy->another(); }
+        virtual bool another() const
+        { return mPolicy->another(); }
 
-    virtual bool demand() const
-    { return mPolicy->demand(); }
+        virtual bool demand() const
+        { return mPolicy->demand(); }
 
-    virtual bool empty() const
-    { return mWaitingActivities.empty(); }
+        virtual bool empty() const
+        { return mWaitingActivities.empty(); }
 
-    virtual void next()
-    { mPolicy->next(); }
+        virtual void next()
+        { mPolicy->next(); }
 
-    virtual void remove(Activity* a)
-    {
-        WaitingActivities::iterator it = std::find(mWaitingActivities.begin(),
-                                                   mWaitingActivities.end(), a);
+        virtual void remove(Activity* a)
+        {
+            WaitingActivities::iterator it =
+                std::find(mWaitingActivities.begin(),
+                          mWaitingActivities.end(), a);
 
-        mWaitingActivities.erase(it);
-    }
+            mWaitingActivities.erase(it);
+        }
 
-    virtual Activity* select() const
-    { return mPolicy->select(); }
+        virtual Activity* select() const
+        { return mPolicy->select(); }
 
-    virtual vle::value::Value* observe() const
-    { return mWaitingActivities.toValue(); }
+        virtual vle::value::Value* observe() const
+        { return mWaitingActivities.toValue(); }
 
-private:
-    WaitingActivities mWaitingActivities;
-    StepSchedulingPolicy* mPolicy;
-};
+    private:
+        WaitingActivities mWaitingActivities;
+        StepSchedulingPolicy* mPolicy;
+    };
 
 } // namespace rcpsp
 

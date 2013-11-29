@@ -30,101 +30,103 @@
 
 namespace rcpsp {
 
-class ActivityScheduler : public vle::devs::Dynamics
-{
-public:
-    ActivityScheduler(const vle::devs::DynamicsInit& init,
-                      const vle::devs::InitEventList& events) :
-        vle::devs::Dynamics(init, events),
-        mActivities(events.get("activities"))
+    class ActivityScheduler : public vle::devs::Dynamics
     {
-    }
-
-    vle::devs::Time init(const vle::devs::Time& /* time */)
-    {
-        mPhase = INIT;
-        return vle::devs::infinity;
-    }
-
-    void output(const vle::devs::Time& /* time */,
-                vle::devs::ExternalEventList& output) const
-    {
-        if (mPhase == SEND) {
-            const Activities::result_t& activities =
-                mActivities.startingActivities();
-
-            for(Activities::result_t::const_iterator it = activities.begin();
-                it != activities.end(); ++it) {
-                vle::devs::ExternalEvent* ee =
-                    new vle::devs::ExternalEvent((*it)->location().name());
-
-                ee << vle::devs::attribute("location",
-                                           (*it)->location().name());
-                ee << vle::devs::attribute("activity", (*it)->toValue());
-                output.push_back(ee);
-            }
+    public:
+        ActivityScheduler(const vle::devs::DynamicsInit& init,
+                          const vle::devs::InitEventList& events) :
+            vle::devs::Dynamics(init, events),
+            mActivities(events.get("activities"))
+        {
         }
-    }
 
-    vle::devs::Time timeAdvance() const
-    {
-        if (mPhase == SEND) return 0;
-        else return vle::devs::infinity;
-    }
-
-    void internalTransition(const vle::devs::Time& /* time */)
-    {
-        if (mPhase == SEND) {
-            mPhase = WAIT;
+        vle::devs::Time init(const vle::devs::Time& /* time */)
+        {
+            mPhase = INIT;
+            return vle::devs::infinity;
         }
-    }
 
-    void externalTransition(
-        const vle::devs::ExternalEventList& events,
-        const vle::devs::Time& time)
-    {
-        vle::devs::ExternalEventList::const_iterator it = events.begin();
+        void output(const vle::devs::Time& /* time */,
+                    vle::devs::ExternalEventList& output) const
+        {
+            if (mPhase == SEND) {
+                const Activities::result_t& activities =
+                    mActivities.startingActivities();
 
-        while (it != events.end()) {
-            if ((*it)->onPort("start")) {
-                if (mPhase == INIT) {
-                    mActivities.starting(time);
-                    if (mActivities.startingActivities().empty()) {
-                        mPhase = WAIT;
-                    } else {
-                        mPhase = SEND;
-                    }
+                for(Activities::result_t::const_iterator it =
+                        activities.begin();
+                    it != activities.end(); ++it) {
+                    vle::devs::ExternalEvent* ee =
+                        new vle::devs::ExternalEvent((*it)->location().name());
+
+                    ee << vle::devs::attribute("location",
+                                               (*it)->location().name());
+                    ee << vle::devs::attribute("activity", (*it)->toValue());
+                    output.push_back(ee);
                 }
-            } else if ((*it)->onPort("done")) {
-                Activity* a = Activity::build(Activity::get(*it));
-
-                TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% DONE") %
-                           getModel().getParentName() % getModelName() %
-                           time % a->name());
-
-                mDoneActivities.push_back(a);
             }
-            ++it;
         }
-    }
 
-    void confluentTransitions(const vle::devs::Time& time,
-                              const vle::devs::ExternalEventList& /* events */)
-    {
-        TraceModel(vle::fmt(" [%1%:%2%] at %3% -> confluent !") %
-                   getModel().getParentName() % getModelName() %
-                   time);
-    }
+        vle::devs::Time timeAdvance() const
+        {
+            if (mPhase == SEND) return 0;
+            else return vle::devs::infinity;
+        }
 
-private:
-    enum Phase { INIT, WAIT, SEND };
+        void internalTransition(const vle::devs::Time& /* time */)
+        {
+            if (mPhase == SEND) {
+                mPhase = WAIT;
+            }
+        }
 
-    Phase mPhase;
+        void externalTransition(
+            const vle::devs::ExternalEventList& events,
+            const vle::devs::Time& time)
+        {
+            vle::devs::ExternalEventList::const_iterator it = events.begin();
 
-    Activities mActivities;
-    Activities mDoneActivities;
-    PrecedencesGraph mPrecedencesGraph;
-};
+            while (it != events.end()) {
+                if ((*it)->onPort("start")) {
+                    if (mPhase == INIT) {
+                        mActivities.starting(time);
+                        if (mActivities.startingActivities().empty()) {
+                            mPhase = WAIT;
+                        } else {
+                            mPhase = SEND;
+                        }
+                    }
+                } else if ((*it)->onPort("done")) {
+                    Activity* a = Activity::build(Activity::get(*it));
+
+                    TraceModel(vle::fmt(" [%1%:%2%] at %3% -> %4% DONE") %
+                               getModel().getParentName() % getModelName() %
+                               time % a->name());
+
+                    mDoneActivities.push_back(a);
+                }
+                ++it;
+            }
+        }
+
+        void confluentTransitions(
+            const vle::devs::Time& time,
+            const vle::devs::ExternalEventList& /* events */)
+        {
+            TraceModel(vle::fmt(" [%1%:%2%] at %3% -> confluent !") %
+                       getModel().getParentName() % getModelName() %
+                       time);
+        }
+
+    private:
+        enum Phase { INIT, WAIT, SEND };
+
+        Phase mPhase;
+
+        Activities mActivities;
+        Activities mDoneActivities;
+        PrecedencesGraph mPrecedencesGraph;
+    };
 
 } // namespace rcpsp
 

@@ -148,18 +148,6 @@ public:
     const locations_t& locations() const
     { return mLocations; }
 
-    vle::value::Value* toValue() const
-    {
-        // TODO: add transport duration !
-        vle::value::Map* value = new vle::value::Map;
-
-        for (locations_t::const_iterator it = mLocations.begin();
-             it != mLocations.end(); ++it) {
-            value->add(it->first, it->second.toValue());
-        }
-        return value;
-    }
-
 private:
     locations_t mLocations;
     durations_t mDurations;

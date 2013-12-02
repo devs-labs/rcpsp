@@ -36,116 +36,116 @@
 
 namespace rcpsp {
 
-class Activity
-{
-public:
-    Activity(const std::string& name,
-             const TemporalConstraints& temporalConstraints) :
-        mName(name), mSteps(new Steps()),
-        mTemporalConstraints(temporalConstraints),
-        mAllocatedResources(0)
-    { }
-
-    Activity(const Activity& a) : mName(a.mName),
-                                  mSteps(new Steps(*a.mSteps)),
-                                  mTemporalConstraints(a.mTemporalConstraints),
-                                  mAllocatedResources(a.mAllocatedResources)
+    class Activity
     {
-        if (not mSteps->empty() and a.mStepIterator != a.mSteps->end()) {
-            mStepIterator = mSteps->find((*a.mStepIterator)->name());
-        } else {
-            mStepIterator = mSteps->begin();
+    public:
+        Activity(const std::string& name,
+                 const TemporalConstraints& temporalConstraints) :
+            mName(name), mSteps(new Steps()),
+            mTemporalConstraints(temporalConstraints),
+            mAllocatedResources(0)
+        { }
+
+        Activity(const Activity& a) : mName(a.mName),
+                                      mSteps(new Steps(*a.mSteps)),
+                                      mTemporalConstraints(a.mTemporalConstraints),
+                                      mAllocatedResources(a.mAllocatedResources)
+        {
+            if (not mSteps->empty() and a.mStepIterator != a.mSteps->end()) {
+                mStepIterator = mSteps->find((*a.mStepIterator)->name());
+            } else {
+                mStepIterator = mSteps->begin();
+            }
         }
-    }
 
-    Activity(const vle::value::Value* value);
+        Activity(const vle::value::Value* value);
 
-    virtual ~Activity()
-    { delete mSteps; }
+        virtual ~Activity()
+        { delete mSteps; }
 
-    void addStep(Step* step)
-    { mSteps->push_back(step); }
+        void addStep(Step* step)
+        { mSteps->push_back(step); }
 
-    const Resources* allocatedResources() const
-    { return mAllocatedResources; }
+        const Resources* allocatedResources() const
+        { return mAllocatedResources; }
 
-    void assign(Resources* r);
+        void assign(Resources* r);
 
-  bool begin() const 
-  { return mStepIterator == mSteps->begin(); }
+        bool begin() const
+        { return mStepIterator == mSteps->begin(); }
 
-    static Activity* build(const vle::value::Value& value)
-    { return new Activity(&value); }
+        static Activity* build(const vle::value::Value& value)
+        { return new Activity(&value); }
 
-    ResourceConstraints buildResourceConstraints() const;
+        ResourceConstraints buildResourceConstraints() const;
 
-    bool checkResourceConstraint() const;
+        bool checkResourceConstraint() const;
 
-    const Step* current() const
-    { return *mStepIterator; }
+        const Step* current() const
+        { return *mStepIterator; }
 
-    bool done(const vle::devs::Time& time) const;
+        bool done(const vle::devs::Time& time) const;
 
-    bool end() const
-    { return mStepIterator == mSteps->end(); }
+        bool end() const
+        { return mStepIterator == mSteps->end(); }
 
-    void finish(const vle::devs::Time& time);
+        void finish(const vle::devs::Time& time);
 
-    static const vle::value::Value& get(const vle::devs::ExternalEvent* ee)
-    { return ee->getAttributeValue("activity"); }
+        static const vle::value::Value& get(const vle::devs::ExternalEvent* ee)
+        { return ee->getAttributeValue("activity"); }
 
-    const Location& location() const
-    { return (*mStepIterator)->location(); }
+        const Location& location() const
+        { return (*mStepIterator)->location(); }
 
-    const std::string& name() const
-    { return mName; }
+        const std::string& name() const
+        { return mName; }
 
-    const Activity& operator=(const Activity& a)
-    {
-        mName = a.mName;
-        mSteps = new Steps(*a.mSteps);
-        mTemporalConstraints = a.mTemporalConstraints;
-        if (not mSteps->empty() and a.mStepIterator != a.mSteps->end()) {
-            mStepIterator = mSteps->find((*a.mStepIterator)->name());
-        } else {
-            mStepIterator = mSteps->begin();
+        const Activity& operator=(const Activity& a)
+        {
+            mName = a.mName;
+            mSteps = new Steps(*a.mSteps);
+            mTemporalConstraints = a.mTemporalConstraints;
+            if (not mSteps->empty() and a.mStepIterator != a.mSteps->end()) {
+                mStepIterator = mSteps->find((*a.mStepIterator)->name());
+            } else {
+                mStepIterator = mSteps->begin();
+            }
+            return *this;
         }
-        return *this;
-    }
 
-    void release();
+        void release();
 
-    Resources* releasedResources() const;
+        Resources* releasedResources() const;
 
-    vle::devs::Time remainingTime(const vle::devs::Time& time) const;
+        vle::devs::Time remainingTime(const vle::devs::Time& time) const;
 
-    const ResourceConstraints& resourceConstraints() const;
+        const ResourceConstraints& resourceConstraints() const;
 
-    void start(const vle::devs::Time& time);
+        void start(const vle::devs::Time& time);
 
-    bool starting(const vle::devs::Time& time) const;
+        bool starting(const vle::devs::Time& time) const;
 
-    const TemporalConstraints& temporalConstraints() const
-    { return mTemporalConstraints; }
+        const TemporalConstraints& temporalConstraints() const
+        { return mTemporalConstraints; }
 
-    vle::value::Value* toValue() const;
+        vle::value::Value* toValue() const;
 
-    void wait(const vle::devs::Time& time);
+        void wait(const vle::devs::Time& time);
 
-private:
-    friend std::ostream& operator<<(std::ostream& o, const Activity& a);
+    private:
+        friend std::ostream& operator<<(std::ostream& o, const Activity& a);
 
-    std::string mName;
-    Steps* mSteps;
-    TemporalConstraints mTemporalConstraints;
+        std::string mName;
+        Steps* mSteps;
+        TemporalConstraints mTemporalConstraints;
 
-    // state
-    Steps::iterator mStepIterator;
-    Resources* mAllocatedResources;
-    bool mWaiting;
-    bool mRunning;
-    bool mDone;
-};
+        // state
+        Steps::iterator mStepIterator;
+        Resources* mAllocatedResources;
+        bool mWaiting;
+        bool mRunning;
+        bool mDone;
+    };
 
 } // namespace rcpsp
 

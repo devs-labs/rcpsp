@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PROBLEM__HPP
+#ifndef __PROBLEM_HPP
 #define __PROBLEM_HPP 1
 
 #include <string>

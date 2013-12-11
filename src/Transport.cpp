@@ -73,11 +73,22 @@ namespace rcpsp {
 
         vle::devs::Time timeAdvance() const
         {
+
+            TraceModel(
+                vle::fmt(" [%1%:%2%] -> ta = %3% ; n = %4%") %
+                getModel().getParentName() % getModelName() %
+                mSigma % mOutDates.size());
+
             return mSigma;
         }
 
         void internalTransition(const vle::devs::Time& time)
         {
+            TraceModel(
+                vle::fmt(" [%1%:%2%] at %3% -> internalTransition") %
+                getModel().getParentName() % getModelName() %
+                time);
+
             Activities::iterator ita = mActivities.begin();
             Dates::iterator itd = mOutDates.begin();
 
@@ -107,6 +118,11 @@ namespace rcpsp {
             const vle::devs::Time& time)
         {
             vle::devs::ExternalEventList::const_iterator it = events.begin();
+
+            TraceModel(
+                vle::fmt(" [%1%:%2%] at %3% -> externalTransition") %
+                getModel().getParentName() % getModelName() %
+                time);
 
             while (it != events.end()) {
                 if ((*it)->onPort("in")) {
@@ -156,7 +172,13 @@ namespace rcpsp {
                             time % (time + mSigma));
 
                         mActivities.push_back(a);
+                    } else {
+                        if (not mOutDates.empty()) {
+                            mSigma -= time - mLastTime;
+                            mLastTime = time;
+                        }
                     }
+
                 }
                 ++it;
             }

@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.1.0.dtd">
+<vle_project version="1.0.1" date="sam., 10 mars 2012" author="Eric Ramat">
+<structures>
+<model name="Top model" type="coupled" x="0" y="0" width="811" height="597"  >
+<submodels>
+<model name="constructor" type="atomic" conditions="cond_constructor" dynamics="dyn_constructor" x="264" y="135" width="100" height="45" >
+<out>
+ <port name="start" />
+</out>
+</model>
+<model name="scheduler" type="atomic" conditions="cond_activity_scheduler" dynamics="dyn_activity_scheduler" x="37" y="22" width="100" height="60" >
+<in>
+ <port name="done" />
+ <port name="start" />
+</in>
+</model>
+</submodels>
+<connections>
+<connection type="internal">
+ <origin model="constructor" port="start" />
+ <destination model="scheduler" port="start" />
+</connection>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="dyn_activity_scheduler" library="ActivityScheduler" package="rcpsp"  />
+<dynamic name="dyn_assignment" library="Assignment" package="rcpsp"  />
+<dynamic name="dyn_constructor" library="Constructor" package="rcpsp"  />
+<dynamic name="dyn_pool" library="Pool" package="rcpsp"  />
+<dynamic name="dyn_pool_constructor" library="PoolConstructor" package="rcpsp"  />
+<dynamic name="dyn_processor" library="Processor" package="rcpsp"  />
+<dynamic name="dyn_step_scheduler" library="StepScheduler" package="rcpsp"  />
+<dynamic name="dyn_transport" library="Transport" package="rcpsp"  />
+</dynamics>
+<classes>
+<class name="Location" >
+<model name="location" type="coupled" x="251" y="20" width="1211" height="495"  >
+<in>
+ <port name="schedule" />
+</in>
+<out>
+ <port name="done" />
+ <port name="out_demand" />
+ <port name="schedule" />
+</out>
+<submodels>
+<model name="Transport" type="atomic" conditions="cond_step_scheduler,cond_transport" dynamics="dyn_transport" observables="obs_transport" x="95" y="225" width="100" height="45" >
+<in>
+ <port name="in" />
+</in>
+<out>
+ <port name="out" />
+</out>
+</model>
+<model name="processor" type="atomic" dynamics="dyn_processor" observables="obs_processor" x="559" y="410" width="100" height="45" >
+<in>
+ <port name="process" />
+</in>
+<out>
+ <port name="done" />
+</out>
+</model>
+<model name="scheduler" type="atomic" conditions="cond_step_scheduler" dynamics="dyn_step_scheduler" observables="obs_scheduler" x="303" y="176" width="100" height="120" >
+<in>
+ <port name="assign" />
+ <port name="done" />
+ <port name="schedule" />
+ <port name="unavailable" />
+</in>
+<out>
+ <port name="demand" />
+ <port name="done" />
+ <port name="out_demand" />
+ <port name="process" />
+ <port name="release" />
+ <port name="schedule" />
+</out>
+</model>
+<model name="ressource_manager" type="coupled" x="607" y="30" width="100" height="60"  >
+<in>
+ <port name="demand" />
+ <port name="release" />
+</in>
+<out>
+ <port name="assign" />
+ <port name="unavailable" />
+</out>
+<submodels>
+<model name="assignment" type="atomic" dynamics="dyn_assignment" x="131" y="132" width="100" height="90" >
+<in>
+ <port name="available" />
+ <port name="demand" />
+ <port name="release" />
+</in>
+<out>
+ <port name="assign" />
+ <port name="demand" />
+ <port name="release" />
+ <port name="unavailable" />
+</out>
+</model>
+<model name="constructor" type="atomic" conditions="cond_pool_constructor" dynamics="dyn_pool_constructor" x="285" y="264" width="100" height="30" >
+</model>
+</submodels>
+<connections>
+<connection type="output">
+ <origin model="assignment" port="unavailable" />
+ <destination model="ressource_manager" port="unavailable" />
+</connection>
+<connection type="input">
+ <origin model="ressource_manager" port="demand" />
+ <destination model="assignment" port="demand" />
+</connection>
+<connection type="input">
+ <origin model="ressource_manager" port="release" />
+ <destination model="assignment" port="release" />
+</connection>
+</connections>
+</model>
+</submodels>
+<connections>
+<connection type="output">
+ <origin model="scheduler" port="done" />
+ <destination model="location" port="done" />
+</connection>
+<connection type="output">
+ <origin model="scheduler" port="out_demand" />
+ <destination model="location" port="out_demand" />
+</connection>
+<connection type="output">
+ <origin model="scheduler" port="schedule" />
+ <destination model="location" port="schedule" />
+</connection>
+<connection type="input">
+ <origin model="location" port="schedule" />
+ <destination model="Transport" port="in" />
+</connection>
+<connection type="internal">
+ <origin model="Transport" port="out" />
+ <destination model="scheduler" port="schedule" />
+</connection>
+<connection type="internal">
+ <origin model="processor" port="done" />
+ <destination model="scheduler" port="done" />
+</connection>
+<connection type="internal">
+ <origin model="ressource_manager" port="assign" />
+ <destination model="scheduler" port="assign" />
+</connection>
+<connection type="internal">
+ <origin model="ressource_manager" port="unavailable" />
+ <destination model="scheduler" port="unavailable" />
+</connection>
+<connection type="internal">
+ <origin model="scheduler" port="demand" />
+ <destination model="ressource_manager" port="demand" />
+</connection>
+<connection type="internal">
+ <origin model="scheduler" port="process" />
+ <destination model="processor" port="process" />
+</connection>
+<connection type="internal">
+ <origin model="scheduler" port="release" />
+ <destination model="ressource_manager" port="release" />
+</connection>
+</connections>
+</model>
+</class>
+<class name="Pool" >
+<model name="pool" type="atomic" conditions="cond_pool" dynamics="dyn_pool" observables="obs_pool" x="334" y="18" width="100" height="75" >
+<in>
+ <port name="assign" />
+ <port name="demand" />
+ <port name="release" />
+</in>
+<out>
+ <port name="assign" />
+ <port name="available" />
+</out>
+</model>
+</class>
+</classes>
+<experiment name="exp" duration="200.000000000000000" begin="0.000000000000000" combination="linear"  >
+<conditions>
+<condition name="cond_activity_scheduler" >
+ <port name="activities" >
+<set><set><string>A1</string><set><set><string>A1_e0</string><double>0.000000000000000</double><string>location_0</string><set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A1_e1</string><double>5.000000000000000</double><string>location_1</string><set><set><string>QC</string><integer>1</integer><boolean>false</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A1_e2</string><double>10.000000000000000</double><string>location_2</string><set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set><set><string>QD</string><integer>1</integer><boolean>false</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A1_e3</string><double>5.000000000000000</double><string>location_1</string><set><set><string>QC</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A1_e4</string><double>0.000000000000000</double><string>location_0</string><set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A2</string><set><set><string>A2_e0</string><double>0.000000000000000</double><string>location_0</string><set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A2_e1</string><double>10.000000000000000</double><string>location_1</string><set><set><string>QC</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A2_e2</string><double>20.000000000000000</double><string>location_2</string><set><set><string>QD</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A2_e3</string><double>5.000000000000000</double><string>location_1</string><set><set><string>QC</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A2_e4</string><double>0.000000000000000</double><string>location_0</string><set><set><string>CamionPt</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A3</string><set><set><string>A3_e0</string><double>0.000000000000000</double><string>location_0</string><set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A3_e1</string><double>5.000000000000000</double><string>location_1</string><set><set><string>QC</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A3_e2</string><double>15.000000000000000</double><string>location_2</string><set><set><string>QD</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A3_e3</string><double>10.000000000000000</double><string>location_1</string><set><set><string>QC</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A3_e4</string><double>0.000000000000000</double><string>location_0</string><set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A4</string><set><set><string>A4_e0</string><double>0.000000000000000</double><string>location_0</string><set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A4_e1</string><double>10.000000000000000</double><string>location_2</string><set><set><string>QC</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A4_e2</string><double>10.000000000000000</double><string>location_1</string><set><set><string>QD</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A4_e3</string><double>5.000000000000000</double><string>location_2</string><set><set><string>QC</string><integer>1</integer><boolean>false</boolean></set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set><set><string>A4_e4</string><double>0.000000000000000</double><string>location_0</string><set><set><string>CamionGd</string><integer>1</integer><boolean>true</boolean></set><set><string>Chauffeur</string><integer>1</integer><boolean>true</boolean></set></set><set><integer>0</integer><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set><set><integer>1</integer><double>85.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double><double>0.000000000000000</double></set></set></set>
+</port>
+</condition>
+<condition name="cond_constructor" >
+ <port name="locations" >
+<map><key name="location_0"><map><key name="pools"><map><key name="pool_1"><set><string>Chauffeur</string><set><string>Chauffeur_1</string><string>Chauffeur_2</string></set></set></key><key name="pool_2"><set><string>CamionPt</string><set><string>CamionPt_1</string></set></set></key><key name="pool_3"><set><string>CamionGd</string><set><string>CamionGd_1</string><string>CamionGd_2</string></set></set></key></map></key><key name="transport"><map><key name="location_1"><double>5.000000000000000</double></key><key name="location_2"><double>10.000000000000000</double></key></map></key></map></key><key name="location_1"><map><key name="pools"><map><key name="pool_1"><set><string>QD</string><set><string>QD_1</string></set></set></key><key name="pool_2"><set><string>QC</string><set><string>QC_1</string><string>QC_2</string></set></set></key><key name="pool_3"><set><string>Camion</string><set></set></set></key><key name="pool_4"><set><string>Chauffeur</string><set></set></set></key></map></key><key name="transport"><map><key name="location_0"><double>5.000000000000000</double></key><key name="location_2"><double>10.000000000000000</double></key></map></key></map></key><key name="location_2"><map><key name="pools"><map><key name="pool_1"><set><string>QC</string><set><string>QC_1</string></set></set></key><key name="pool_2"><set><string>QD</string><set><string>QD_1</string></set></set></key><key name="pool_3"><set><string>Camion</string><set></set></set></key><key name="pool_4"><set><string>Chauffeur</string><set></set></set></key></map></key><key name="transport"><map><key name="location_0"><double>20.000000000000000</double></key><key name="location_1"><double>10.000000000000000</double></key></map></key></map></key></map>
+</port>
+</condition>
+<condition name="cond_pool" >
+ <port name="pool" >
+</port>
+</condition>
+<condition name="cond_pool_constructor" >
+ <port name="pools" >
+</port>
+</condition>
+<condition name="cond_step_scheduler" >
+ <port name="location" >
+</port>
+</condition>
+<condition name="cond_transport" >
+ <port name="durations" >
+</port>
+</condition>
+</conditions>
+<views>
+<outputs>
+<output name="view_available_resources" location="" format="local" package="vle.output"  plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_running_activity" location="" format="local" package="vle.output"  plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_running_step" location="" format="local" package="vle.output"  plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_transport" location="" format="local" package="vle.output"  plugin="file" >
+<map><key name="flush-by-bag"><boolean>false</boolean></key><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_used_resource_types" location="" format="local" package="vle.output"  plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_used_resources" location="" format="local" package="vle.output"  plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+<output name="view_waiting" location="" format="local" package="vle.output"  plugin="file" >
+<map><key name="julian-day"><boolean>false</boolean></key><key name="locale"><string>C</string></key><key name="type"><string>csv</string></key></map></output>
+
+</outputs>
+<observables>
+<observable name="obs_pool" >
+<port name="available_resources" >
+ <attachedview name="view_available_resources" />
+</port>
+
+</observable>
+
+<observable name="obs_processor" >
+<port name="running_activity" >
+ <attachedview name="view_running_activity" />
+</port>
+
+<port name="running_step" >
+ <attachedview name="view_running_step" />
+</port>
+
+<port name="used_resource_types" >
+ <attachedview name="view_used_resource_types" />
+</port>
+
+<port name="used_resources" >
+ <attachedview name="view_used_resources" />
+</port>
+
+</observable>
+
+<observable name="obs_scheduler" >
+<port name="waiting" >
+ <attachedview name="view_waiting" />
+</port>
+
+</observable>
+
+<observable name="obs_transport" >
+<port name="transport" >
+ <attachedview name="view_transport" />
+</port>
+
+</observable>
+
+</observables>
+<view name="view_available_resources" output="view_available_resources" type="timed" timestep="1.000000000000000" />
+
+<view name="view_running_activity" output="view_running_activity" type="timed" timestep="1.000000000000000" />
+
+<view name="view_running_step" output="view_running_step" type="timed" timestep="1.000000000000000" />
+
+<view name="view_transport" output="view_transport" type="timed" timestep="1.000000000000000" />
+
+<view name="view_used_resource_types" output="view_used_resource_types" type="timed" timestep="1.000000000000000" />
+
+<view name="view_used_resources" output="view_used_resources" type="timed" timestep="1.000000000000000" />
+
+<view name="view_waiting" output="view_waiting" type="timed" timestep="1.000000000000000" />
+
+</views>
+</experiment>
+</vle_project>

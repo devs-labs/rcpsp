@@ -2,7 +2,7 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.1.0.dtd">
 <vle_project version="1.0.1" date="sam., 10 mars 2012" author="Eric Ramat">
 <structures>
-<model name="Top model" type="coupled" x="0" y="0" width="847" height="446"  >
+<model name="Top model" type="coupled" x="0" y="0" width="689" height="635"  >
 <submodels>
 <model name="constructor" type="atomic" conditions="cond_constructor" dynamics="dyn_constructor" x="264" y="135" width="100" height="45" >
 <out>
@@ -36,7 +36,7 @@
 </dynamics>
 <classes>
 <class name="Location" >
-<model name="location" type="coupled" x="251" y="20" width="847" height="446"  >
+<model name="location" type="coupled" x="251" y="20" width="689" height="635"  >
 <in>
  <port name="schedule" />
 </in>
@@ -70,7 +70,7 @@
  <port name="schedule" />
 </out>
 </model>
-<model name="transport" type="atomic" conditions="cond_step_scheduler" dynamics="dyn_transport" x="81" y="154" width="100" height="45" >
+<model name="transport" type="atomic" conditions="cond_step_scheduler,cond_transport" dynamics="dyn_transport" x="81" y="154" width="100" height="45" >
 <in>
  <port name="in" />
 </in>
@@ -191,77 +191,7 @@
 </condition>
 <condition name="cond_constructor" >
  <port name="locations" >
-   <map><key name="location_1">
-     <map>
-       <key name="pools">
-
-	 <map><key name="pool_1"><set><string>R1</string><set><string>R1_1_1</string><string>R1_1_2</string><string>R1_1_3</string></set></set></key><key name="pool_2"><set><string>R2</string><set><string>R2_1_1</string><string>R2_1_2</string></set></set></key></map>
-
-       </key>
-       <key name="transport">
-	 <map>
-	   <key name="location_2"><double>10</double></key>
-	 </map>
-       </key>
-     </map>
-   </key>
-
-
-
-   <key name="location_2">
-     <map>
-       <key name="pools">
-
-	 <map>
-
-<key name="pool_1"><set><string>R1</string><set><string>R1_2_1</string><string>R1_2_2</string></set></set></key><key name="pool_2"><set><string>R2</string><set><string>R2_2_1</string><string>R2_2_2</string></set></set></key></map>
-
-       </key>
-       <key name="transport">
-	 <map>
-	   <key name="location_1"><double>10</double></key>
-	 </map>
-       </key>
-     </map>
-
-
-   </key>
-   <key name="location_3">
-     <map>
-
-<key name="pools">
-
-	 <map>
-<key name="pool_1"><set><string>R1</string><set><string>R1_3_1</string><string>R1_3_2</string><string>R1_3_3</string></set></set></key><key name="pool_2"><set><string>R2</string><set><string>R23__1</string><string>R2_3_2</string></set></set></key></map>
-
-</key>
-       <key name="transport">
-	 <map>
-	   <key name="location_1"><double>10</double></key>
-	 </map>
-       </key>
-     </map>
-
-   </key>
-   <key name="location_4">
-     <map>
-
-<key name="pools">
-
-	 <map>
-
-       <key name="pool_1"><set><string>R1</string><set><string>R1_4_1</string><string>R1_4_2</string><string>R1_4_3</string></set></set></key><key name="pool_2"><set><string>R2</string><set><string>R2_4_1</string><string>R2_4_2</string></set></set></key></map>
-
-</key>
-       <key name="transport">
-	 <map>
-	   <key name="location_1"><double>10</double></key>
-	 </map>
-       </key>
-     </map>
-
-   </key>
-   </map>
+<map><key name="location_1"><map><key name="pools"><map><key name="pool_1"><set><string>R1</string><set><string>R1_1_1</string><string>R1_1_2</string><string>R1_1_3</string></set></set></key><key name="pool_2"><set><string>R2</string><set><string>R2_1_1</string><string>R2_1_2</string></set></set></key></map></key><key name="transport"><map><key name="location_2"><double>10.000000000000000</double></key></map></key></map></key><key name="location_2"><map><key name="pools"><map><key name="pool_1"><set><string>R1</string><set><string>R1_2_1</string><string>R1_2_2</string></set></set></key><key name="pool_2"><set><string>R2</string><set><string>R2_2_1</string><string>R2_2_2</string></set></set></key></map></key><key name="transport"><map><key name="location_1"><double>10.000000000000000</double></key></map></key></map></key><key name="location_3"><map><key name="pools"><map><key name="pool_1"><set><string>R1</string><set><string>R1_3_1</string><string>R1_3_2</string><string>R1_3_3</string></set></set></key><key name="pool_2"><set><string>R2</string><set><string>R23__1</string><string>R2_3_2</string></set></set></key></map></key><key name="transport"><map><key name="location_1"><double>10.000000000000000</double></key></map></key></map></key><key name="location_4"><map><key name="pools"><map><key name="pool_1"><set><string>R1</string><set><string>R1_4_1</string><string>R1_4_2</string><string>R1_4_3</string></set></set></key><key name="pool_2"><set><string>R2</string><set><string>R2_4_1</string><string>R2_4_2</string></set></set></key></map></key><key name="transport"><map><key name="location_1"><double>10.000000000000000</double></key></map></key></map></key></map>
 </port>
 </condition>
 <condition name="cond_pool" >
@@ -274,6 +204,10 @@
 </condition>
 <condition name="cond_step_scheduler" >
  <port name="location" >
+</port>
+</condition>
+<condition name="cond_transport" >
+ <port name="durations" >
 </port>
 </condition>
 </conditions>

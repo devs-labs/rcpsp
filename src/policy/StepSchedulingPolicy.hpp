@@ -38,7 +38,8 @@ public:
     virtual void add(Activity* a) =0;
     virtual bool another() const =0;
     virtual bool demand() const =0;
-    virtual void next() =0;
+    virtual bool next() =0;
+    virtual void reset() =0;
     virtual Activity* select() const =0;
 
 protected:

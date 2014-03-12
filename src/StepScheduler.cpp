@@ -48,8 +48,8 @@ namespace rcpsp {
         virtual bool empty() const
         { return mWaitingActivities.empty(); }
 
-        virtual void next()
-        { mPolicy->next(); }
+        virtual bool next()
+        { return mPolicy->next(); }
 
         virtual void remove(Activity* a)
         {
@@ -59,6 +59,9 @@ namespace rcpsp {
 
             mWaitingActivities.erase(it);
         }
+
+        virtual void reset()
+        { mPolicy->reset(); }
 
         virtual Activity* select() const
         { return mPolicy->select(); }

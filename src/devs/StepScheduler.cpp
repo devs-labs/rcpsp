@@ -25,6 +25,8 @@
 
 #include <vle/utils/Trace.hpp>
 
+// #include <iostream>
+
 namespace rcpsp { namespace devs {
 
 StepScheduler::StepScheduler(const vle::devs::DynamicsInit& init,
@@ -144,8 +146,12 @@ vle::devs::Time StepScheduler::timeAdvance() const
     }
 }
 
-void StepScheduler::internalTransition(const vle::devs::Time& /* time */)
+void StepScheduler::internalTransition(const vle::devs::Time& time)
 {
+
+    // std::cout << "BEGIN INTERNAL " << std::endl;
+    // std::cout << time << " => " << mPhase << std::endl;
+
     if (mPhase == SEND_DEMAND) {
         Activity* a = select();
 
@@ -164,7 +170,7 @@ void StepScheduler::internalTransition(const vle::devs::Time& /* time */)
             mPhase = SEND_DEMAND;
         }
     } else if (mPhase == SEND_PROCESS) {
-        if (mRunningActivity) {
+        if (mRunningActivity) { // est-ce utile ?
             const Resources& r = *mRunningActivity->allocatedResources();
 
             for (unsigned int i = 0; i < r.size(); ++i) {
@@ -190,7 +196,7 @@ void StepScheduler::internalTransition(const vle::devs::Time& /* time */)
 	}
     } else if (mPhase == SEND_RELEASE) {
         while (not mReleasedActivities.empty()) {
-            Activity* a = mReleasedActivities.back();
+            Activity* a = mReleasedActivities.front();
 
             a->release();
             if (a->end()) {
@@ -205,7 +211,7 @@ void StepScheduler::internalTransition(const vle::devs::Time& /* time */)
                     mPhase = SEND_SCHEDULE;
                 }
             }
-            mReleasedActivities.pop_back();
+            mReleasedActivities.erase(mReleasedActivities.begin());
         }
     } else if (mPhase == SEND_SCHEDULE) {
         mSchedulingActivities.clear();
@@ -215,6 +221,10 @@ void StepScheduler::internalTransition(const vle::devs::Time& /* time */)
             mPhase = SEND_DEMAND;
         }
     }
+
+    // std::cout << time << " => " << mPhase << std::endl;
+    // std::cout << "END INTERNAL " << std::endl;
+
 }
 
 void StepScheduler::externalTransition(
@@ -223,15 +233,22 @@ void StepScheduler::externalTransition(
 {
     vle::devs::ExternalEventList::const_iterator it = events.begin();
 
+    // std::cout << time << " == BEGIN BAG == " << std::endl;
+
     while (it != events.end()) {
+
+        // std::cout << time << ": externalEvent => "
+        //           << (*it)->getPortName() << " / " << mPhase
+        //           << std::endl;
+
         if ((*it)->onPort("schedule")) {
             if (Location::get(*it) == mLocation) {
                 Activity* a = Activity::build(Activity::get(*it));
 
                 TraceModel(
-                    vle::fmt(" [%1%:%2%] at %3% -> schedule = %4%/%5%") %
+                    vle::fmt(" [%1%:%2%] at %3% -> schedule = %4%/%5% [%6%]") %
                     getModel().getParentName() % getModelName() %
-                    time % a->current()->name() % a->name());
+                    time % a->current()->name() % a->name() % mPhase);
 
                 add(a);
                 if (mPhase == WAIT_SCHEDULE) {
@@ -268,10 +285,18 @@ void StepScheduler::externalTransition(
             if (a->checkResourceConstraint()) {
                 mRunningActivity = a;
                 remove(a);
+                reset();
                 mPhase = SEND_PROCESS;
+            } else {
+                // bug ???
             }
         } else if ((*it)->onPort("done")) {
             Activity* a = Activity::build(Activity::get(*it));
+
+            TraceModel(
+                vle::fmt(" [%1%:%2%] at %3% -> done = %4% [%5%]") %
+                getModel().getParentName() % getModelName() %
+                time % a->name() % mPhase);
 
             mReleasedActivities.push_back(a);
 	    if (mPhase == WAIT_SCHEDULE or mPhase == WAIT_RESOURCE) {
@@ -284,8 +309,15 @@ void StepScheduler::externalTransition(
                 mPhase = SEND_OUT_DEMAND;
             } else {
                 if (another()) {
-                    next();
-                    mPhase = SEND_DEMAND;
+                    if (next()) {
+                        mPhase = SEND_DEMAND;
+                    } else {
+                        if (not mReleasedActivities.empty()) {
+                            mPhase = SEND_RELEASE;
+                        } else {
+                            mPhase = WAIT_RESOURCE;
+                        }
+                    }
                 } else {
                     if (not mReleasedActivities.empty()) {
                         mPhase = SEND_RELEASE;
@@ -297,6 +329,10 @@ void StepScheduler::externalTransition(
         }
         ++it;
     }
+
+    // std::cout << time << " => " << mPhase << std::endl;
+    // std::cout << time << " == END BAG == " << std::endl;
+
 }
 
 void StepScheduler::confluentTransitions(

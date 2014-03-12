@@ -149,6 +149,11 @@ namespace rcpsp {
                                 getModel().getParentName() % getModelName() %
                                 time % previousLocation);
                             TraceModel(
+                                vle::fmt(
+                                    " [%1%:%2%] at %3% -> duration = %4%") %
+                                getModel().getParentName() % getModelName() %
+                                time % mDurations[previousLocation]);
+                            TraceModel(
                                 vle::fmt(" [%1%:%2%] at %3% -> date = %4%") %
                                 getModel().getParentName() % getModelName() %
                                 time % outDate);

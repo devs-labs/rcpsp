@@ -32,23 +32,45 @@ class FIFOPolicy : public StepSchedulingPolicy
 {
 public:
     FIFOPolicy(WaitingActivities& waitingActivities) :
-    StepSchedulingPolicy(waitingActivities)
+    StepSchedulingPolicy(waitingActivities), mSelectedActivity(0)
     { }
 
     virtual void add(Activity* a)
     { mWaitingActivities.push_back(a); }
 
     virtual bool another() const
-    { return false; }
+    { return true; }
 
     virtual bool demand() const
     { return false; }
 
-    virtual void next()
-    { }
+    virtual bool next()
+    {
+        if (mSelectedActivity == 0) {
+            mSelectedActivityIt = mWaitingActivities.begin();
+        }
+        ++mSelectedActivityIt;
+        if (mSelectedActivityIt != mWaitingActivities.end()) {
+            mSelectedActivity = *mSelectedActivityIt;
+            return true;
+        } else {
+            mSelectedActivity = 0;
+            return false;
+        }
+    }
+
+    virtual void reset()
+    { mSelectedActivity = 0; }
 
     virtual Activity* select() const
-    { return mWaitingActivities.empty() ? 0 : mWaitingActivities.front(); }
+    {
+        return mSelectedActivity == 0 ? mWaitingActivities.front() :
+            mSelectedActivity;
+    }
+
+private:
+    WaitingActivities::iterator mSelectedActivityIt;
+    Activity* mSelectedActivity;
 };
 
 } // namespace rcpsp

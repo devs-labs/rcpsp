@@ -49,7 +49,7 @@ Activity::Activity(const vle::value::Value* value)
         }
     } else {
         mAllocatedResources = 0;
-        mStepIterator = mSteps->begin();
+        mStepIterator = mSteps->end();
     }
 }
 
@@ -157,7 +157,7 @@ const ResourceConstraints& Activity::resourceConstraints() const
 
 void Activity::start(const vle::devs::Time& time)
 {
-    if (not mSteps->empty() and mStepIterator != mSteps->end()) {
+    if (not mSteps->empty() and mStepIterator != mSteps->end() ) {
         (*mStepIterator)->start(time);
     } else {
         //TODO exception
@@ -166,8 +166,12 @@ void Activity::start(const vle::devs::Time& time)
 
 bool Activity::starting(const vle::devs::Time& time) const
 {
-    if (not mSteps->empty() and mStepIterator != mSteps->end()) {
-        return (*mStepIterator)->starting(time);
+    if (mTemporalConstraints.starting(time)) {
+        if (not mSteps->empty()) {
+            return mSteps->front()->starting(time);
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
@@ -195,7 +199,8 @@ vle::value::Value* Activity::toValue() const
 
 void Activity::wait(const vle::devs::Time& time)
 {
-    if (not mSteps->empty() and mStepIterator != mSteps->end()) {
+    if (not mSteps->empty()) {
+        mStepIterator = mSteps->begin();
         (*mStepIterator)->wait(time);
     } else {
         //TODO exception

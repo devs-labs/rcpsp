@@ -27,14 +27,34 @@
 
 namespace rcpsp {
 
+vle::devs::Time Activities::next(const vle::devs::Time& time) const
+{
+    vle::devs::Time min = vle::devs::infinity;
+
+    for (Activities::const_iterator it = begin(); it != end(); ++it) {
+        if (min > (*it)->temporalConstraints().earlyStartTime()) {
+            min = (*it)->temporalConstraints().earlyStartTime();
+        }
+    }
+    return min - time;
+}
+
 void Activities::removeStartingActivities()
 {
-    //TODO
+    for (Activities::const_iterator it = mStartingActivities.begin();
+         it != mStartingActivities.end(); ++it) {
+        for (Activities::iterator it2 = begin(); it2 != end(); ++it2) {
+            if (*it == *it2) {
+                erase(it2);
+                break;
+            }
+        }
+    }
+    mStartingActivities.clear();
 }
 
 void Activities::starting(const vle::devs::Time& time)
 {
-    mStartingActivities.clear();
     for (Activities::const_iterator it = begin(); it != end(); ++it) {
         if ((*it)->starting(time)) {
             (*it)->wait(time);

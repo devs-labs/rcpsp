@@ -66,6 +66,8 @@ public:
         std::vector < Activity* >::clear();
     }
 
+    vle::devs::Time next(const vle::devs::Time& time) const;
+
     vle::value::Value* observe_activity() const
     {
         vle::value::Set* list = new vle::value::Set;

@@ -28,6 +28,8 @@
 #include <data/Activity.hpp>
 #include <data/PrecedencesGraph.hpp>
 
+#include <iostream>
+
 namespace rcpsp {
 
     class ActivityScheduler : public vle::devs::Dynamics
@@ -40,9 +42,11 @@ namespace rcpsp {
         {
         }
 
-        vle::devs::Time init(const vle::devs::Time& /* time */)
+        vle::devs::Time init(const vle::devs::Time& time)
         {
             mPhase = INIT;
+            mLastTime = time;
+            mSigma = 0;
             return vle::devs::infinity;
         }
 
@@ -69,14 +73,37 @@ namespace rcpsp {
 
         vle::devs::Time timeAdvance() const
         {
-            if (mPhase == SEND) return 0;
-            else return vle::devs::infinity;
+            if (mPhase == SEND) {
+                return 0;
+            } else if (mPhase == WAIT) {
+                return mSigma;
+            } else {
+                return vle::devs::infinity;
+            }
         }
 
-        void internalTransition(const vle::devs::Time& /* time */)
+        void internalTransition(const vle::devs::Time& time)
         {
             if (mPhase == SEND) {
-                mPhase = WAIT;
+                const Activities::result_t& activities =
+                    mActivities.startingActivities();
+
+                for(Activities::result_t::const_iterator it =
+                        activities.begin();
+                    it != activities.end(); ++it) {
+                    mRunningActivities.push_back(*it);
+                }
+                mActivities.removeStartingActivities();
+                if (mActivities.empty()) {
+                    mPhase = DONE;
+                } else {
+                    mSigma = mActivities.next(time);
+                    mLastTime = time;
+                    mPhase = WAIT;
+                }
+            } else if (mPhase == WAIT) {
+                mActivities.starting(time);
+                mPhase = SEND;
             }
         }
 
@@ -107,6 +134,10 @@ namespace rcpsp {
                 }
                 ++it;
             }
+            if (mSigma > 0) {
+                mSigma -= (time - mLastTime);
+                mLastTime = time;
+            }
         }
 
         void confluentTransitions(
@@ -119,11 +150,14 @@ namespace rcpsp {
         }
 
     private:
-        enum Phase { INIT, WAIT, SEND };
+        enum Phase { DONE, INIT, WAIT, SEND };
 
         Phase mPhase;
+        vle::devs::Time mLastTime;
+        vle::devs::Time mSigma;
 
         Activities mActivities;
+        Activities mRunningActivities;
         Activities mDoneActivities;
         PrecedencesGraph mPrecedencesGraph;
     };
